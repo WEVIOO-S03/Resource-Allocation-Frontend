@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Auth from "./pages/auth";
 //import AdminnDashboard from "./pages/dash";
-import AdminDashboard from "./pages/dashboard";
+import AdminDashboard from "./pages/usersList";
 import ProjectAccessManagement from "./pages/manageProfil";
 
 export default function App() {
