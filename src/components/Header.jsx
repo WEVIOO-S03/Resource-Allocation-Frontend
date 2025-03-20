@@ -51,7 +51,12 @@ const Header = ({ title }) => {
                 <FontAwesomeIcon icon={faChevronDown} className="ml-2 text-gray-600" />
               </button>
               
-              <div className={`dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 ${userDropdownOpen ? 'active' : ''}`}>
+  
+              <div 
+                className={`dropdown-menu absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 ${
+                  userDropdownOpen ? 'block' : 'hidden'
+                }`}
+              >
                 <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-indigo-50">Profile</a>
                 <a href="#" className="block px-4 py-2 text-gray-800 hover:bg-indigo-50">Settings</a>
                 <div className="border-t border-gray-200 my-1"></div>

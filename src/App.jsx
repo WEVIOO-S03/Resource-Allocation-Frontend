@@ -10,7 +10,7 @@ export default function App() {
       <Routes>
         <Route path="/auth" element={<Auth />} />
         <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/edituser" element={<ProjectAccessManagement />} />
+        <Route path="/edituser/:id" element={<ProjectAccessManagement />} />
       </Routes>
     </Router>
   );
