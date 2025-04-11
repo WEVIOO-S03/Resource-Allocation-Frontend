@@ -55,16 +55,16 @@ const AuthPage = () => {
       localStorage.setItem('user', JSON.stringify(data.user));
       
       const userRoles = Array.isArray(data.user.roles) 
-  ? data.user.roles 
-  : Object.values(data.user.roles || {}); 
+      ? data.user.roles 
+      : Object.values(data.user.roles || {}); 
 
-console.log('User roles after fix:', userRoles);
+    console.log('User roles after fix:', userRoles);
 
-if (userRoles.includes('ROLE_ADMIN')) {
-  window.location.href = '/admin';
-} else {
-  window.location.href = '/user-dashboard';
-}
+    if (userRoles.includes('ROLE_ADMIN')) {
+      window.location.href = '/admin';
+    } else {
+      window.location.href = '/user-dashboard';
+    }
 
     } catch (err) {
       setError(err.message);

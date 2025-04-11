@@ -8,8 +8,24 @@ import {
   faCog,
   faSignOutAlt
 } from '@fortawesome/free-solid-svg-icons';
+import { logout, getCurrentUser } from '../api/authService';
+import { Link } from 'react-router-dom';
 
 const Sidebar = () => {
+  const currentUser = getCurrentUser();
+  const userInitials = currentUser?.email ? 
+    currentUser.email.split('@')[0].substring(0, 2).toUpperCase() : 'US';
+  
+  const handleLogout = async (e) => {
+    e.preventDefault();
+    try {
+      await logout();
+      // The page will reload automatically in the logout function
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   return (
     <div className="sidebar w-64 fixed inset-y-0 left-0 z-30 overflow-y-auto text-white"
       style={{ background: 'linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%)' }}>
@@ -21,36 +37,36 @@ const Sidebar = () => {
       <div className="px-6 py-4 border-t border-b border-indigo-800">
         <div className="flex items-center">
           <div className="w-10 h-10 rounded-full bg-indigo-300 flex items-center justify-center text-indigo-700 font-bold">
-            AD
+            {userInitials}
           </div>
           <div className="ml-3">
-            <p className="font-medium">Admin User</p>
-            <p className="text-xs opacity-75">admin@example.com</p>
+            <p className="font-medium">{currentUser?.roles?.includes('ROLE_ADMIN') ? 'Admin User' : 'User'}</p>
+            <p className="text-xs opacity-75">{currentUser?.email || 'user@example.com'}</p>
           </div>
         </div>
       </div>
       
       <nav className="px-4 py-4">
         <h3 className="text-xs uppercase tracking-wider opacity-75 px-2 mb-2">Main</h3>
-        <a href="#" className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
+        <Link to="/admin" className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
           <FontAwesomeIcon icon={faTachometerAlt} className="w-6" />
           <span>Dashboard</span>
-        </a>
-        <a href="#" className="sidebar-link active flex items-center py-2 px-2 rounded-lg mb-1 text-white">
+        </Link>
+        <Link to="/admin" className="sidebar-link active flex items-center py-2 px-2 rounded-lg mb-1 text-white">
           <FontAwesomeIcon icon={faUsers} className="w-6" />
           <span>Users</span>
-        </a>
-        <a href="#" className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
+        </Link>
+        <Link to="/admin" className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
           <FontAwesomeIcon icon={faFolderOpen} className="w-6" />
           <span>Projects</span>
-        </a>
+        </Link>
         
         <h3 className="text-xs uppercase tracking-wider opacity-75 px-2 mb-2 mt-6">Settings</h3>
-        <a href="#" className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
+        <Link to="/settings" className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
           <FontAwesomeIcon icon={faCog} className="w-6" />
           <span>Settings</span>
-        </a>
-        <a href="#" className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
+        </Link>
+        <a href="#" onClick={handleLogout} className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
           <FontAwesomeIcon icon={faSignOutAlt} className="w-6" />
           <span>Logout</span>
         </a>

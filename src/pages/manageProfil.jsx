@@ -12,7 +12,7 @@ import {
 import { useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Header from '../components/Header';
-import { fetchUsers, updateUserRights, fetchProjects, approveUser, getAuthToken  } from '../api/userService';
+import { fetchUsers, fetchProjects, updateUserAccess } from '../api/userService';
 
 const ProjectAccessManagement = () => {
   const { id } = useParams(); // Get the ID from URL parameters
@@ -138,35 +138,24 @@ const ProjectAccessManagement = () => {
         throw new Error('User data is missing');
       }
       
-      let firstUpdateResult = await updateUserRights(user.id, {
+      const projectsData = projects.map(project => ({
+        id: project.id,
+        canConsult: project.canConsult === true,
+        canEdit: project.canEdit === true
+      }));
+      
+      const updateResult = await updateUserAccess(user.id, {
         position: position,
-        skills: skills
+        skills: skills,
+        projects: projectsData
       });
       
-      console.log("Updated user basic info:", firstUpdateResult);
+      console.log("Updated user access:", updateResult);
       
-      const projectsWithAccess = projects.filter(p => p.canConsult || p.canEdit);
-      
-      console.log(`Updating access for ${projectsWithAccess.length} projects`);
-      
-      for (const project of projects) {
-        try {
-          const projectUpdateResult = await updateUserRights(user.id, {
-            projectId: project.id,
-            canConsult: project.canConsult === true,
-            canEdit: project.canEdit === true
-          });
-          
-          console.log(`Updated project ${project.id}:`, projectUpdateResult);
-        } catch (projectError) {
-          console.error(`Error updating project ${project.id}:`, projectError);
-        }
+      if (updateResult.user) {
+        setUser(updateResult.user);
       }
-     
-      const approveResult = await approveUser(user.id);
-      console.log("User approved:", approveResult);
       
-      setUser({...user, status: 'APPROVED'});
       setSavedSuccess(true);
       
     } catch (error) {

@@ -1,20 +1,6 @@
 // api/userService.js
 
 export const getAuthToken = () => localStorage.getItem('token');
-/*const handleApiError = (error, defaultMessage = 'An error occurred') => {
-  console.error(error);
-  if (error.response) {
-    // The request was made and the server responded with a status code
-    // that falls out of the range of 2xx
-    return error.response.data.error || defaultMessage;
-  } else if (error.request) {
-    // The request was made but no response was received
-    return 'No response from server. Please check your connection.';
-  } else {
-    // Something happened in setting up the request that triggered an Error
-    return error.message || defaultMessage;
-  }
-};*/
 
 export const fetchUsers = async (page = 1, limit = 10) => {
   try {
@@ -140,9 +126,12 @@ export const getDashboardStats = async () => {
   }
 };
 
-export const approveUser = async (userId, data = {}) => {
+
+export const updateUserAccess = async (userId, data) => {
   try {
-    const response = await fetch(`http://localhost:8000/api/admin/users/${userId}/approve`, {
+    console.log(`Sending update access request for user ${userId}:`, data);
+    
+    const response = await fetch(`http://localhost:8000/api/admin/users/${userId}/update-access`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -152,38 +141,12 @@ export const approveUser = async (userId, data = {}) => {
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to approve user: ${response.status}`);
+      throw new Error(`Failed to update user access: ${response.status}`);
     }
     
     return await response.json();
   } catch (error) {
-    console.error('Error approving user:', error);
-    throw error;
-  }
-};
-
-export const updateUserRights = async (userId, data) => {
-  try {
-    console.log(`Sending update request for user ${userId}:`, data);
-    
-    if (data.projectId) {
-      console.log(`Project ${data.projectId} access rights:`, {
-        canConsult: Boolean(data.canConsult),
-        canEdit: Boolean(data.canEdit)
-      });
-    }
-    
-    const response = await fetch(`http://localhost:8000/api/admin/users/${userId}/update-rights`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${getAuthToken()}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    });
-    
-  } catch (error) {
-    console.error('Error updating user rights:', error);
+    console.error('Error updating user access:', error);
     throw error;
   }
 };
@@ -209,3 +172,4 @@ export const deleteUser = async (userId) => {
     throw error;
   }
 };
+
