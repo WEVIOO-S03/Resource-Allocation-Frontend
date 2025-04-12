@@ -1,21 +1,29 @@
 // components/Sidebar.js
 import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faTachometerAlt,
-  faUsers,
+import { 
+  faTachometerAlt, 
+  faUsers, 
   faFolderOpen,
   faCog,
   faSignOutAlt
 } from '@fortawesome/free-solid-svg-icons';
-import { logout, getCurrentUser } from '../api/authService';
-import { Link } from 'react-router-dom';
+import { getCurrentUser, logout } from '../api/authService';
+import logo from '../assets/logo.png';
 
 const Sidebar = () => {
+  const location = useLocation();
   const currentUser = getCurrentUser();
-  const userInitials = currentUser?.email ? 
-    currentUser.email.split('@')[0].substring(0, 2).toUpperCase() : 'US';
   
+  const userInitials = currentUser ? 
+    `${currentUser.firstName?.[0] || ''}${currentUser.lastName?.[0] || ''}`.toUpperCase() 
+    : 'U';
+
+  const roles = currentUser?.roles || [];
+  const userRoles = Array.isArray(roles) ? roles : Object.values(roles);
+  const isAdmin = userRoles.includes('ROLE_ADMIN');
+
   const handleLogout = async (e) => {
     e.preventDefault();
     try {
@@ -29,9 +37,10 @@ const Sidebar = () => {
   return (
     <div className="sidebar w-64 fixed inset-y-0 left-0 z-30 overflow-y-auto text-white"
       style={{ background: 'linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%)' }}>
-      <div className="px-6 pt-8 pb-4">
-        <h2 className="text-2xl font-bold">ProjManage</h2>
-        <p className="text-sm opacity-75">Admin Dashboard</p>
+      <div className="px-4 pt-4 ">
+        <div className="flex items-center justify-center mb-2">
+          <img src={logo} alt="Logo" className="h-16 w-50" />
+        </div>
       </div>
       
       <div className="px-6 py-4 border-t border-b border-indigo-800">
@@ -40,7 +49,7 @@ const Sidebar = () => {
             {userInitials}
           </div>
           <div className="ml-3">
-            <p className="font-medium">{currentUser?.roles?.includes('ROLE_ADMIN') ? 'Admin User' : 'User'}</p>
+            <p className="font-medium">{isAdmin ? 'Admin User' : 'User'}</p>
             <p className="text-xs opacity-75">{currentUser?.email || 'user@example.com'}</p>
           </div>
         </div>
@@ -48,15 +57,17 @@ const Sidebar = () => {
       
       <nav className="px-4 py-4">
         <h3 className="text-xs uppercase tracking-wider opacity-75 px-2 mb-2">Main</h3>
-        <Link to="/admin" className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
+        <Link to={isAdmin ? "/admin" : "/projects"} className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
           <FontAwesomeIcon icon={faTachometerAlt} className="w-6" />
           <span>Dashboard</span>
         </Link>
-        <Link to="/admin" className="sidebar-link active flex items-center py-2 px-2 rounded-lg mb-1 text-white">
-          <FontAwesomeIcon icon={faUsers} className="w-6" />
-          <span>Users</span>
-        </Link>
-        <Link to="/admin" className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
+        {isAdmin && (
+          <Link to="/admin" className="sidebar-link active flex items-center py-2 px-2 rounded-lg mb-1 text-white">
+            <FontAwesomeIcon icon={faUsers} className="w-6" />
+            <span>Users</span>
+          </Link>
+        )}
+        <Link to="/projects" className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
           <FontAwesomeIcon icon={faFolderOpen} className="w-6" />
           <span>Projects</span>
         </Link>

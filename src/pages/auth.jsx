@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import 'animate.css';
+import { useNavigate } from 'react-router-dom';
 
 const AuthPage = () => {
   const [activeTab, setActiveTab] = useState('login');
@@ -19,6 +20,7 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { id, value, type, checked } = e.target;
@@ -48,23 +50,17 @@ const AuthPage = () => {
       const data = await response.json();
       
       if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
+        throw new Error(data.message || 'Login failed');
       }
       
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
       
-      const userRoles = Array.isArray(data.user.roles) 
-      ? data.user.roles 
-      : Object.values(data.user.roles || {}); 
-
-    console.log('User roles after fix:', userRoles);
-
-    if (userRoles.includes('ROLE_ADMIN')) {
-      window.location.href = '/admin';
-    } else {
-      window.location.href = '/user-dashboard';
-    }
+      setSuccess('Login successful!');
+      setTimeout(() => {
+        const isAdmin = Array.isArray(data.user.roles) && data.user.roles.includes('ROLE_ADMIN');
+        navigate(isAdmin ? '/admin' : '/projects');
+      }, 1000);
 
     } catch (err) {
       setError(err.message);

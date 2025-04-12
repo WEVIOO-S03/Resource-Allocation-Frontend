@@ -173,3 +173,30 @@ export const deleteUser = async (userId) => {
   }
 };
 
+export const fetchUserProjects = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/user/projects', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${getAuthToken()}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user projects: ${response.status}`);
+    }
+    
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Non-JSON response received:', await response.text());
+      throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching user projects:', error);
+    return [];
+  }
+};
+

@@ -3,11 +3,16 @@ import { useEffect, useState } from "react";
 import Auth from "./pages/auth";
 import AdminDashboard from "./pages/usersList";
 import ProjectAccessManagement from "./pages/manageProfil";
-import { isAuthenticated } from "./api/authService";
+import ProjectList from "./pages/projectList";
+import { isAuthenticated, isAdmin } from "./api/authService";
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, adminOnly = false }) => {
   if (!isAuthenticated()) {
     return <Navigate to="/auth" />;
+  }
+  
+  if (adminOnly && !isAdmin()) {
+    return <Navigate to="/projects" />;
   }
   
   return children;
@@ -27,8 +32,17 @@ export default function App() {
         <Route 
           path="/admin" 
           element={
-            <ProtectedRoute>
+            <ProtectedRoute adminOnly={true}>
               <AdminDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/projects" 
+          element={
+            <ProtectedRoute>
+              <ProjectList />
             </ProtectedRoute>
           } 
         />
@@ -36,13 +50,13 @@ export default function App() {
         <Route 
           path="/edituser/:id" 
           element={
-            <ProtectedRoute>
+            <ProtectedRoute adminOnly={true}>
               <ProjectAccessManagement />
             </ProtectedRoute>
           } 
         />
         
-        <Route path="*" element={<Navigate to={isAuthenticated() ? "/admin" : "/auth"} />} />
+        <Route path="*" element={<Navigate to={isAuthenticated() ? (isAdmin() ? "/admin" : "/projects") : "/auth"} />} />
       </Routes>
     </Router>
   );

@@ -42,3 +42,8 @@ export const logout = async () => {
   export const isAuthenticated = () => {
     return !!getAuthToken() && !!getCurrentUser();
   };
+
+  export const isAdmin = () => {
+    const user = getCurrentUser();
+    return user && Array.isArray(user.roles) && user.roles.includes('ROLE_ADMIN');
+  };
