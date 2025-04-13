@@ -1,0 +1,541 @@
+.header-container {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: white;
+}
+
+.search-bar {
+  width: 180px;
+  position: relative;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 0.5rem;
+  padding-left: 2rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  color: #374151;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0.5rem center;
+  background-size: 1.25rem;
+}
+
+.navigation-container {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.year-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  border-right: 1px solid #e5e7eb;
+  height: 2rem;
+  flex-shrink: 0;
+}
+
+.year-nav button {
+  padding: 0.25rem;
+  color: #6b7280;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.year-nav span {
+  font-size: 0.875rem;
+  color: #374151;
+  min-width: 3rem;
+  text-align: center;
+}
+
+.month-buttons {
+  display: flex;
+  padding-left: 1rem;
+  height: 2rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.month-btn {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+  white-space: nowrap;
+  position: relative;
+  border: none;
+  background: none;
+  flex: 1;
+  text-align: center;
+  min-width: 0;
+}
+
+.month-btn.active {
+  color: #4f46e5;
+  font-weight: 500;
+}
+
+.month-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #4f46e5;
+}
+
+/* Calendar Layout */
+.attendance-container {
+  height: calc(100vh - 64px); /* Adjust based on your header height */
+  background: white;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-row {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  gap: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.date-range {
+  font-size: 0.875rem;
+  color: #374151;
+  min-width: 200px;
+}
+
+.attendance-grid {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.employee-column {
+  width: 250px;
+  flex-shrink: 0;
+  border-right: 1px solid #e5e7eb;
+  background: white;
+  z-index: 10;
+}
+
+.employee-list {
+  overflow-y: auto;
+  height: 100%;
+}
+
+.employee-row {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.employee-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+}
+
+.employee-info {
+  flex: 1;
+}
+
+.employee-name {
+  font-weight: 500;
+  color: #111827;
+  font-size: 0.875rem;
+}
+
+.employee-title {
+  color: #6b7280;
+  font-size: 0.75rem;
+  margin-top: 0.125rem;
+}
+
+.department-header {
+  padding: 0.5rem 1rem;
+  background-color: white;
+  font-weight: 500;
+  color: #7c3aed;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Calendar Grid */
+.calendar-grid {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+.calendar-header {
+  display: flex;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.calendar-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.week-row {
+  display: flex;
+  min-height: 2.5rem;
+  position: relative;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.week-row:last-child {
+  border-bottom: none;
+}
+
+.week-indicator {
+  display: none;
+}
+
+.day-column {
+  min-width: 2.5rem;
+  width: 2.5rem;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.day-column:last-child {
+  border-right: none;
+}
+
+.day-header {
+  padding: 0.25rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.125rem;
+}
+
+.day-number {
+  font-size: 0.75rem;
+  color: #374151;
+}
+
+.day-name {
+  font-size: 0.625rem;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+
+.status-cell {
+  min-width: 40px;
+  width: 40px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-left: 1px solid #e5e7eb;
+  padding: 8px 0;
+}
+
+.status-indicator {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+}
+
+.status-present .status-indicator {
+  background-color: #34d399;
+}
+
+.status-absent .status-indicator {
+  background-color: #f87171;
+}
+
+.status-late .status-indicator {
+  background-color: #fbbf24;
+}
+
+.today {
+  background-color: #f3f4f6;
+}
+
+/* Working Time Popup */
+.working-time-popup {
+  position: fixed;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  z-index: 50;
+  min-width: 200px;
+}
+
+.working-time-popup h4 {
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.working-time-entry {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.25rem 0;
+}
+
+.working-time-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.working-time-value {
+  color: #111827;
+  font-size: 0.875rem;
+}
+
+.booked-holiday {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.action-icons {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+.action-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+/* Main Grid Layout */
+.main-grid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.days-header {
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.employee-column-header {
+  width: 250px;
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
+  background: white;
+  border-right: 1px solid #e5e7eb;
+}
+
+.days-row {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.day-header {
+  min-width: 40px;
+  width: 40px;
+  padding: 0.5rem 0;
+  text-align: center;
+  border-left: 1px solid #e5e7eb;
+}
+
+.day-number {
+  font-size: 0.875rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.day-name {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+}
+
+/* Departments and Employees */
+.departments-container {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.department-section {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.department-header {
+  padding: 0.5rem 1rem;
+  background-color: white;
+  font-weight: 500;
+  color: #7c3aed;
+  font-size: 0.875rem;
+}
+
+.employee-attendance-row {
+  display: flex;
+  border-top: 1px solid #e5e7eb;
+  min-height: 48px;
+}
+
+.employee-info-cell {
+  width: 250px;
+  flex-shrink: 0;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: white;
+  border-right: 1px solid #e5e7eb;
+}
+
+.employee-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+}
+
+.employee-info {
+  flex: 1;
+}
+
+.employee-name {
+  font-weight: 500;
+  color: #111827;
+  font-size: 0.875rem;
+}
+
+.employee-title {
+  color: #6b7280;
+  font-size: 0.75rem;
+  margin-top: 0.125rem;
+}
+
+.action-icons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #6b7280;
+  cursor: pointer;
+}
+
+/* Attendance Cells */
+.attendance-cells {
+  display: flex;
+  flex: 1;
+  overflow-x: auto;
+}
+
+.status-cell {
+  min-width: 40px;
+  width: 40px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-left: 1px solid #e5e7eb;
+}
+
+.status-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #e5e7eb;
+}
+
+.status-present .status-dot {
+  background-color: #22c55e;
+}
+
+.status-absent .status-dot {
+  background-color: #ef4444;
+}
+
+.status-late .status-dot {
+  background-color: #f59e0b;
+}
+
+.today {
+  background-color: #f8fafc;
+}
+
+/* Working Time Popup */
+.working-time-popup {
+  position: fixed;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  z-index: 50;
+  min-width: 200px;
+}
+
+.working-time-popup h4 {
+  font-weight: 500;
+  color: #111827;
+  margin-bottom: 0.75rem;
+}
+
+.working-time-entry {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.25rem 0;
+}
+
+.working-time-label {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.working-time-value {
+  color: #111827;
+  font-size: 0.875rem;
+} 

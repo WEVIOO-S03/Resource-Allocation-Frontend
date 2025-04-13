@@ -4,6 +4,7 @@ import Auth from "./pages/auth";
 import AdminDashboard from "./pages/usersList";
 import ProjectAccessManagement from "./pages/manageProfil";
 import ProjectList from "./pages/projectList";
+import AttendanceView from "./pages/projectDetails";
 import { isAuthenticated, isAdmin } from "./api/authService";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -55,6 +56,8 @@ export default function App() {
             </ProtectedRoute>
           } 
         />
+        
+        <Route path="/attendance" element={<AttendanceView />} />
         
         <Route path="*" element={<Navigate to={isAuthenticated() ? (isAdmin() ? "/admin" : "/projects") : "/auth"} />} />
       </Routes>
