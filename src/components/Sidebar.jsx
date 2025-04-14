@@ -72,7 +72,7 @@ const Sidebar = () => {
           <FontAwesomeIcon icon={faFolderOpen} className="w-6" />
           <span>Projects</span>
         </Link>
-        <Link to="/attendance" className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
+        <Link to="/projectDetail" className="sidebar-link flex items-center py-2 px-2 rounded-lg mb-1 text-white">
           <FontAwesomeIcon icon={faCalendarAlt} className="w-6" />
           <span>Time & Attendance</span>
         </Link>

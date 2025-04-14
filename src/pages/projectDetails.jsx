@@ -1,197 +1,218 @@
-import React, { useState } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isToday, getWeek, startOfWeek, endOfWeek } from 'date-fns';
+import React, { useState, useRef, useEffect } from 'react';
+import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isToday, isWeekend } from 'date-fns';
 import '../styles/AttendanceView.css';
 
 const AttendanceView = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [searchTerm, setSearchTerm] = useState('');
-  const [workingTimePopup, setWorkingTimePopup] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedColumn, setSelectedColumn] = useState(null);
+  const daysRowRef = useRef(null);
+  const attendanceRowsRef = useRef([]);
 
-  const employees = [
+  // Mock data for departments and employees
+  const departments = [
     {
-      id: 1,
-      name: 'Grant Marshall',
-      role: 'Design manager',
-      department: 'Design',
-      avatar: 'https://via.placeholder.com/40'
+      name: 'Design',
+      employees: [
+        { id: 1, name: 'Grant Marshall', title: 'Design manager', avatar: 'https://i.pravatar.cc/150?img=1' },
+        { id: 2, name: 'Pena Valdez', title: 'Senior designer', avatar: 'https://i.pravatar.cc/150?img=2' },
+      ]
     },
     {
-      id: 2,
-      name: 'Pena Valdez',
-      role: 'Design manager',
-      department: 'Design',
-      avatar: 'https://via.placeholder.com/40'
-    },
-    {
-      id: 3,
-      name: 'Jessica Miles',
-      role: 'Assistant engineer',
-      department: 'Engineer',
-      avatar: 'https://via.placeholder.com/40'
-    },
-    {
-      id: 4,
-      name: 'Kerri Barber',
-      role: 'Engineer',
-      department: 'Engineer',
-      avatar: 'https://via.placeholder.com/40'
+      name: 'Engineer',
+      employees: [
+        { id: 3, name: 'Jessica Miles', title: 'Associate engineer', avatar: 'https://i.pravatar.cc/150?img=3' },
+        { id: 4, name: 'Kerri Barber', title: 'Engineer', avatar: 'https://i.pravatar.cc/150?img=4' },
+        { id: 5, name: 'Natasha Gamble', title: 'Senior engineer', avatar: 'https://i.pravatar.cc/150?img=5' },
+      ]
     }
   ];
 
-  const departments = ['Design', 'Engineer'];
-  
-  // Get all days for the calendar view
-  const calendarDays = eachDayOfInterval({
-    start: startOfMonth(currentDate),
-    end: endOfMonth(currentDate)
-  });
-
-  const handlePreviousYear = () => {
-    setCurrentDate(prevDate => new Date(prevDate.getFullYear() - 1, prevDate.getMonth(), 1));
-  };
-
-  const handleNextYear = () => {
-    setCurrentDate(prevDate => new Date(prevDate.getFullYear() + 1, prevDate.getMonth(), 1));
-  };
-
-  const handleMonthClick = (month) => {
-    setCurrentDate(new Date(currentDate.getFullYear(), month, 1));
-  };
-
   const getAttendanceStatus = (employeeId, date) => {
-    // This would normally come from your backend
-    const statuses = ['present', 'late', 'absent'];
-    const randomIndex = Math.floor((employeeId + date.getDate()) % 3);
-    return statuses[randomIndex];
+    // Mock attendance status - you would fetch this from your backend
+    const random = Math.random();
+    if (random < 0.7) return 'full';
+    if (random < 0.9) return 'moyen';
+    return 'low';
   };
 
+  const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
+  const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
+  
   const handleCellClick = (employee, date) => {
-    setWorkingTimePopup({
-      employee,
-      date,
-      position: { x: window.event.clientX, y: window.event.clientY }
+    setSelectedEmployee(employee);
+    setSelectedDate(date);
+  };
+
+  const handleColumnClick = (date) => {
+    setSelectedColumn(date);
+  };
+
+  const isColumnSelected = (date) => {
+    return selectedColumn && format(selectedColumn, 'yyyy-MM-dd') === format(date, 'yyyy-MM-dd');
+  };
+
+  const isWeekEnd = (date) => {
+    return isWeekend(date);
+  };
+
+  const startDate = startOfMonth(currentDate);
+  const endDate = endOfMonth(currentDate);
+  const calendarDays = eachDayOfInterval({ start: startDate, end: endDate });
+
+  const filteredDepartments = departments.map(dept => ({
+    ...dept,
+    employees: dept.employees.filter(emp => 
+      emp.name.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  })).filter(dept => dept.employees.length > 0);
+
+  useEffect(() => {
+    const daysRow = daysRowRef.current;
+    const attendanceRows = attendanceRowsRef.current;
+
+    const handleScroll = (e) => {
+      if (e.target === daysRow) {
+        attendanceRows.forEach(row => {
+          if (row) row.scrollLeft = daysRow.scrollLeft;
+        });
+      } else {
+        const scrollLeft = e.target.scrollLeft;
+        daysRow.scrollLeft = scrollLeft;
+        attendanceRows.forEach(row => {
+          if (row && row !== e.target) row.scrollLeft = scrollLeft;
+        });
+      }
+    };
+
+    daysRow?.addEventListener('scroll', handleScroll);
+    attendanceRows.forEach(row => {
+      row?.addEventListener('scroll', handleScroll);
     });
-  };
 
-  const filteredEmployees = employees.filter(emp => 
-    emp.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  const getWeekIndicator = (date) => {
-    const weekStart = startOfWeek(date, { weekStartsOn: 1 });
-    const weekEnd = endOfWeek(date, { weekStartsOn: 1 });
-    return `${format(weekStart, 'd')} - ${format(weekEnd, 'd')} ${format(date, 'MMMM')} - W${getWeek(date)}`;
-  };
+    return () => {
+      daysRow?.removeEventListener('scroll', handleScroll);
+      attendanceRows.forEach(row => {
+        row?.removeEventListener('scroll', handleScroll);
+      });
+    };
+  }, []);
 
   return (
     <div className="attendance-container">
-      {/* Header row with date range, search and navigation */}
-      <div className="header-row">
-        <div className="date-range">
-          {format(startOfMonth(currentDate), 'dd MMM yyyy')} - {format(endOfMonth(currentDate), 'dd MMM yyyy')}
-        </div>
-
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search name"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        <div className="navigation-container">
-          <div className="year-nav">
-            <button onClick={handlePreviousYear}>&lt;</button>
-            <span>{currentDate.getFullYear()}</span>
-            <button onClick={handleNextYear}>&gt;</button>
-          </div>
-          <div className="month-buttons">
-            {Array.from({ length: 12 }, (_, i) => (
-              <button
-                key={i}
-                className={`month-btn ${currentDate.getMonth() === i ? 'active' : ''}`}
-                onClick={() => handleMonthClick(i)}
-              >
-                {format(new Date(currentDate.getFullYear(), i, 1), 'MMM')}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Grid */}
+      {/* Main calendar grid */}
       <div className="main-grid">
+        {/* Calendar controls */}
+        <div className="calendar-controls">
+          <div className="date-range">
+            {format(startDate, 'dd MMM yyyy')} - {format(endDate, 'dd MMM yyyy')}
+          </div>
+          <div className="controls-right">
+            <div className="search-bar">
+              <input
+                type="text"
+                placeholder="Search name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <div className="navigation-container">
+              <div className="year-nav">
+                <button onClick={handlePrevMonth}>&lt;</button>
+                <span>{format(currentDate, 'yyyy')}</span>
+                <button onClick={handleNextMonth}>&gt;</button>
+              </div>
+              <div className="month-buttons">
+                {Array.from({ length: 12 }, (_, i) => {
+                  const monthDate = new Date(currentDate.getFullYear(), i);
+                  return (
+                    <button
+                      key={i}
+                      className={`month-btn ${i === currentDate.getMonth() ? 'active' : ''}`}
+                      onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), i))}
+                    >
+                      {format(monthDate, 'MMM')}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Days header */}
         <div className="days-header">
-          <div className="employee-column-header"></div>
-          <div className="days-row">
+          <div className="employee-column-header">
+            Employees
+          </div>
+          <div className="days-row" ref={daysRowRef}>
             {calendarDays.map((day, index) => (
-              <div key={index} className="day-header">
+              <div 
+                key={index} 
+                className={`day-header ${isColumnSelected(day) ? 'selected' : ''} ${isWeekEnd(day) ? 'week-end' : ''}`}
+                onClick={() => handleColumnClick(day)}
+              >
                 <div className="day-number">{format(day, 'd')}</div>
-                <div className="day-name">{format(day, 'EEE').toUpperCase()}</div>
+                <div className="day-name">{format(day, 'EEE')}</div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* Departments and Employees */}
+        {/* Departments and employees */}
         <div className="departments-container">
-          {departments.map(dept => (
-            <div key={dept} className="department-section">
+          {filteredDepartments.map((dept, deptIndex) => (
+            <div key={deptIndex} className="department-section">
               <div className="department-header">
-                {dept}
+                {dept.name}
               </div>
-              {filteredEmployees
-                .filter(emp => emp.department === dept)
-                .map(emp => (
-                  <div key={emp.id} className="employee-attendance-row">
-                    <div className="employee-info-cell">
-                      <img src={emp.avatar} alt="" className="employee-avatar" />
-                      <div className="employee-info">
-                        <div className="employee-name">{emp.name}</div>
-                        <div className="employee-title">{emp.role}</div>
-                      </div>
-                      <div className="action-icons">
-                        <span className="action-icon">⚙️</span>
-                      </div>
-                    </div>
-                    <div className="attendance-cells">
-                      {calendarDays.map((day, dayIndex) => (
-                        <div
-                          key={dayIndex}
-                          className={`status-cell status-${getAttendanceStatus(emp.id, day)} ${isToday(day) ? 'today' : ''}`}
-                          onClick={() => handleCellClick(emp, day)}
-                        >
-                          <div className="status-dot" />
-                        </div>
-                      ))}
+              {dept.employees.map((emp, empIndex) => (
+                <div key={empIndex} className="employee-attendance-row">
+                  <div className="employee-info-cell">
+                    <img src={emp.avatar} alt={emp.name} className="employee-avatar" />
+                    <div className="employee-info">
+                      <div className="employee-name">{emp.name}</div>
+                      <div className="employee-title">{emp.title}</div>
                     </div>
                   </div>
-                ))}
+                  <div 
+                    className="attendance-cells" 
+                    ref={el => {
+                      if (el) {
+                        attendanceRowsRef.current[deptIndex * dept.employees.length + empIndex] = el;
+                      }
+                    }}
+                  >
+                    {calendarDays.map((day, dayIndex) => (
+                      <div
+                        key={dayIndex}
+                        className={`status-cell status-${getAttendanceStatus(emp.id, day)} ${isToday(day) ? 'today' : ''} ${isColumnSelected(day) ? 'selected' : ''} ${isWeekEnd(day) ? 'week-end' : ''}`}
+                        onClick={() => handleCellClick(emp, day)}
+                      >
+                        <div className="status-dot" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Working Time Popup */}
-      {workingTimePopup && (
-        <div className="working-time-popup" style={{
-          left: workingTimePopup.position.x,
-          top: workingTimePopup.position.y
-        }}>
-          <h4>Working Time</h4>
+      {/* Working time popup */}
+      {selectedEmployee && selectedDate && (
+        <div className="working-time-popup" style={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+          <h4>{selectedEmployee.name} - {format(selectedDate, 'MMM d, yyyy')}</h4>
           <div className="working-time-entry">
-            <span className="working-time-label">Check in:</span>
-            <span className="working-time-value">09:00</span>
+            <span className="working-time-label">Check-in:</span>
+            <span className="working-time-value">9:00 AM</span>
           </div>
           <div className="working-time-entry">
-            <span className="working-time-label">Check out:</span>
-            <span className="working-time-value">17:00</span>
-          </div>
-          <div className="working-time-entry">
-            <span className="working-time-label">Total:</span>
-            <span className="working-time-value">7h 56min</span>
+            <span className="working-time-label">Check-out:</span>
+            <span className="working-time-value">6:00 PM</span>
           </div>
         </div>
       )}

@@ -96,21 +96,27 @@
   background-color: #4f46e5;
 }
 
-/* Calendar Layout */
 .attendance-container {
-  height: calc(100vh - 64px); /* Adjust based on your header height */
+  height: 100%;
   background: white;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-.header-row {
+.main-grid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.calendar-controls {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
-  padding: 1rem;
-  gap: 2rem;
-  border-bottom: 1px solid #e5e7eb;
+  justify-content: space-between;
 }
 
 .date-range {
@@ -119,10 +125,10 @@
   min-width: 200px;
 }
 
-.attendance-grid {
+.controls-right {
   display: flex;
-  flex: 1;
-  overflow: hidden;
+  align-items: center;
+  gap: 2rem;
 }
 
 .employee-column {
@@ -177,7 +183,6 @@
   font-size: 0.875rem;
   border-bottom: 1px solid #e5e7eb;
 }
-
 /* Calendar Grid */
 .calendar-grid {
   flex: 1;
@@ -265,15 +270,15 @@
   border-radius: 9999px;
 }
 
-.status-present .status-indicator {
+.status-full .status-indicator {
   background-color: #34d399;
 }
 
-.status-absent .status-indicator {
+.status-low .status-indicator {
   background-color: #f87171;
 }
 
-.status-late .status-indicator {
+.status-moyen .status-indicator {
   background-color: #fbbf24;
 }
 
@@ -343,27 +348,22 @@
   cursor: pointer;
 }
 
-/* Main Grid Layout */
-.main-grid {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
 
 .days-header {
   display: flex;
-  position: sticky;
-  top: 0;
-  z-index: 10;
   background: white;
   border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 
 .employee-column-header {
   width: 250px;
   flex-shrink: 0;
   padding: 0.75rem 1rem;
+  font-weight: 500;
+  color: #374151;
   background: white;
   border-right: 1px solid #e5e7eb;
 }
@@ -372,6 +372,12 @@
   display: flex;
   flex: 1;
   overflow-x: auto;
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
+}
+
+.days-row::-webkit-scrollbar {
+  display: none; 
 }
 
 .day-header {
@@ -380,6 +386,26 @@
   padding: 0.5rem 0;
   text-align: center;
   border-left: 1px solid #e5e7eb;
+  cursor: pointer;
+  position: relative;
+}
+
+.day-header.selected {
+  background-color: #f3f4f6;
+}
+
+.day-header.selected::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #4f46e5;
+}
+
+.day-header.week-end {
+  border-right: 2px solid #e5e7eb;
 }
 
 .day-number {
@@ -394,29 +420,23 @@
   margin-top: 0.25rem;
   text-transform: uppercase;
 }
-
 /* Departments and Employees */
 .departments-container {
   flex: 1;
-  overflow-y: auto;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .department-section {
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.department-header {
-  padding: 0.5rem 1rem;
-  background-color: white;
-  font-weight: 500;
-  color: #7c3aed;
-  font-size: 0.875rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .employee-attendance-row {
   display: flex;
-  border-top: 1px solid #e5e7eb;
-  min-height: 48px;
+  min-height: 3.5rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .employee-info-cell {
@@ -428,6 +448,9 @@
   gap: 0.75rem;
   background: white;
   border-right: 1px solid #e5e7eb;
+  position: sticky;
+  left: 0;
+  z-index: 10;
 }
 
 .employee-avatar {
@@ -464,11 +487,17 @@
   cursor: pointer;
 }
 
-/* Attendance Cells */
 .attendance-cells {
   display: flex;
   flex: 1;
   overflow-x: auto;
+  scrollbar-width: none; 
+  -ms-overflow-style: none; 
+  scroll-snap-type: x mandatory;
+}
+
+.attendance-cells::-webkit-scrollbar {
+  display: none; 
 }
 
 .status-cell {
@@ -482,6 +511,14 @@
   border-left: 1px solid #e5e7eb;
 }
 
+.status-cell.week-end {
+  border-right: 2px solid #e5e7eb;
+}
+
+.status-cell.selected {
+  background-color: #f3f4f6;
+}
+
 .status-dot {
   width: 16px;
   height: 16px;
@@ -489,53 +526,18 @@
   background-color: #e5e7eb;
 }
 
-.status-present .status-dot {
+.status-full .status-dot {
   background-color: #22c55e;
 }
 
-.status-absent .status-dot {
+.status-low .status-dot {
   background-color: #ef4444;
 }
 
-.status-late .status-dot {
+.status-moyen .status-dot {
   background-color: #f59e0b;
 }
 
 .today {
   background-color: #f8fafc;
-}
-
-/* Working Time Popup */
-.working-time-popup {
-  position: fixed;
-  background: white;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.375rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
-  z-index: 50;
-  min-width: 200px;
-}
-
-.working-time-popup h4 {
-  font-weight: 500;
-  color: #111827;
-  margin-bottom: 0.75rem;
-}
-
-.working-time-entry {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0.25rem 0;
-}
-
-.working-time-label {
-  color: #6b7280;
-  font-size: 0.875rem;
-}
-
-.working-time-value {
-  color: #111827;
-  font-size: 0.875rem;
 } 

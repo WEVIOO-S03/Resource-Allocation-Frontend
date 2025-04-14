@@ -57,7 +57,7 @@ export default function App() {
           } 
         />
         
-        <Route path="/attendance" element={<AttendanceView />} />
+        <Route path="/projectDetail" element={<AttendanceView />} />
         
         <Route path="*" element={<Navigate to={isAuthenticated() ? (isAdmin() ? "/admin" : "/projects") : "/auth"} />} />
       </Routes>
