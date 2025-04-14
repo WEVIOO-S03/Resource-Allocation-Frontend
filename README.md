@@ -6,7 +6,6 @@ This repository contains the React frontend application that connects to the Sym
 
 - Node.js 
 - npm or Yarn
-- Backend API running
 
 ## Installation & Setup
 
