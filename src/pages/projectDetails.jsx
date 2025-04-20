@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterval, isToday, isWeekend } from 'date-fns';
 import { useParams } from 'react-router-dom';
 import '../styles/AttendanceView.css';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
+import Layout from '../components/Layout';
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -390,10 +389,10 @@ const ProjectDetails = () => {
   }, []);
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header title={`Project Details - ${projectName}`} />
+    
+      
+      
+        <Layout title={`Project Details - ${projectName}`}>
         <div className="attendance-container">
           <div className="main-grid">
             <div className="calendar-controls">
@@ -583,8 +582,8 @@ const ProjectDetails = () => {
           )}
 
         </div>
-      </div>
-    </div>
+      </Layout>
+    
   );
 };
 

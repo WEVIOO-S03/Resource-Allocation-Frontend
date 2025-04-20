@@ -28,12 +28,13 @@ const Header = ({ title }) => {
   };
 
   return (
-      <header className="bg-white shadow-sm z-20 relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <header className="bg-white shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-800">{title}</h1>
 
           <div className="flex items-center space-x-4">
+            
             {/* Notifications */}
             <div className="relative">
               <button className="p-2 rounded-full hover:bg-gray-100 focus:outline-none">

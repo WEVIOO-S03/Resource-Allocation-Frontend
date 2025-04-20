@@ -11,8 +11,7 @@ import {
   faComment
 } from '@fortawesome/free-solid-svg-icons';
 import { fetchUserProjects } from '../api/userService';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
+import Layout from '../components/Layout';
 
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);
@@ -43,37 +42,28 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <div className="flex-1 ml-64">
-          <Header title="Dashboard" />
+      <Layout title="Dashboard">
           <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           </div>
-        </div>
-      </div>
+        </Layout>
+     
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen">
-        <Sidebar />
-        <div className="flex-1 ml-64">
-          <Header title="Dashboard" />
+      <Layout title="Dashboard">
           <div className="flex items-center justify-center min-h-[calc(100vh-64px)]">
             <div className="text-red-500">{error}</div>
           </div>
-        </div>
-      </div>
+        
+      </Layout>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      <Sidebar />
-      <div className="flex-1 ml-64">
-        <Header title="My Projects" />
+    <Layout title="My Projects">
         
         <div className="p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -164,8 +154,8 @@ const Dashboard = () => {
             </div>
           )}
         </div>
-      </div>
-    </div>
+      
+    </Layout>
   );
 };
 
