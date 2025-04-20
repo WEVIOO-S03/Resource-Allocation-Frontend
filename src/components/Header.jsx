@@ -28,22 +28,12 @@ const Header = ({ title }) => {
   };
 
   return (
-    <header className="bg-white shadow-sm z-20 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <header className="bg-white shadow-sm z-20 relative">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
           <h1 className="text-2xl font-semibold text-gray-800">{title}</h1>
 
           <div className="flex items-center space-x-4">
-            {/* Search */}
-            <div className="relative">
-              <input 
-                type="text" 
-                placeholder="Search..." 
-                className="search-input bg-gray-100 rounded-lg py-2 pl-10 pr-4 w-64 focus:outline-none focus:bg-white focus:ring-2 focus:ring-indigo-500"
-              />
-              <FontAwesomeIcon icon={faSearch} className="absolute left-3 top-3 text-gray-400" />
-            </div>
-
             {/* Notifications */}
             <div className="relative">
               <button className="p-2 rounded-full hover:bg-gray-100 focus:outline-none">
