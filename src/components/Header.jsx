@@ -31,7 +31,7 @@ const Header = ({ title }) => {
     <header className="bg-white shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold text-gray-800">{title}</h1>
+          <h1 className="text-2xl font-semibold text-slate-800">{title}</h1>
 
           <div className="flex items-center space-x-4">
             
@@ -49,10 +49,10 @@ const Header = ({ title }) => {
                 className="flex items-center focus:outline-none"
                 onClick={toggleUserDropdown}
               >
-                <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white">
+                <div className="w-8 h-8 rounded-full bg-indigo-300 flex items-center justify-center text-slate-700 font-bold">
                   {userInitials}
                 </div>
-                <FontAwesomeIcon icon={faChevronDown} className="ml-2 text-gray-600" />
+                <FontAwesomeIcon icon={faChevronDown} className="ml-2 text-slate-600" />
               </button>
 
               <div 

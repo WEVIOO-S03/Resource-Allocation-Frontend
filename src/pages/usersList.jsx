@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { faUsers, faCheckCircle, faClock, faFolder, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
+
 import StatsCard from '../components/Cards';
 import UserTable from '../components/UserTable';
 import Pagination from '../components/Pagination';
+import Layout from '../components/Layout';
+
 
 import { fetchUsers } from '../api/userService';
 
@@ -163,14 +164,7 @@ const AdminDashboard = () => {
       );
 
       return (
-        <div className="bg-gray-50 min-h-screen flex">
-          {/* Sidebar Component */}
-          <Sidebar />
-
-          {/* Main Content */}
-          <div className="ml-64 flex-1">
-            {/* Header Component */}
-            <Header title="User Management" />
+        <Layout title="Users Management">
 
             {/* Content */}
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -212,8 +206,8 @@ const AdminDashboard = () => {
                 </>
               )}
             </main>
-          </div>
-        </div>
+          
+        </Layout>
       );
     };
 

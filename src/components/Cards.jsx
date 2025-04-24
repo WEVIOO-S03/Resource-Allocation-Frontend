@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const StatsCard = ({ icon, iconColor, bgColor, title, value, delay }) => {
   return (
-    <div className="card bg-white rounded-xl p-6 animate__animated animate__fadeInUp" style={{ animationDelay: `${delay}s` }}>
+    <div className="card bg-white rounded-xl p-6 animate__animated animate__fadeInUp h-full" style={{ animationDelay: `${delay}s` }}>
       <div className="flex items-center">
         <div className={`rounded-full ${bgColor} p-3`}>
           <FontAwesomeIcon icon={icon} className={iconColor} />

@@ -12,7 +12,7 @@ const Layout = ({ children, title }) => {
           <Header title={title} />
         </div>
         
-        <div className="flex-1 overflow-hidden p-6">
+        <div className="flex-1 overflow-y-auto p-6">
           {children}
         </div>
       </div>

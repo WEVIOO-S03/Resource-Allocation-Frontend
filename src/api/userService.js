@@ -175,7 +175,7 @@ export const deleteUser = async (userId) => {
 
 export const fetchUserProjects = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/user/projects', {
+    const response = await fetch('http://localhost:8000/api/projects', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,

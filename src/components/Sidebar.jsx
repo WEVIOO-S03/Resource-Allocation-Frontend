@@ -36,21 +36,21 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="sidebar w-64 fixed inset-y-0 left-0 z-30 overflow-y-auto text-white"
-      style={{ background: 'linear-gradient(180deg, #4f46e5 0%, #7c3aed 100%)' }}>
+    <div className="sidebar w-64 fixed inset-y-0 left-0 z-30 overflow-y-auto text-white 
+              bg-gradient-to-b from-slate-800 to-slate-700">
       <div className="px-4 pt-4 ">
         <div className="flex items-center justify-center mb-2">
           <img src={logo} alt="Logo" className="h-16 w-50" />
         </div>
       </div>
       
-      <div className="px-6 py-4 border-t border-b border-indigo-800">
+      <div className="px-6 py-4 border-t border-b border-slate-700">
         <div className="flex items-center">
           <div className="w-10 h-10 rounded-full bg-indigo-300 flex items-center justify-center text-indigo-700 font-bold">
             {userInitials}
           </div>
           <div className="ml-3">
-            <p className="font-medium">{isAdmin ? 'Admin User' : 'User'}</p>
+            <p className="font-medium">{isAdmin ? 'Admin User' : currentUser?.firstName}</p>
             <p className="text-xs opacity-75">{currentUser?.email || 'user@example.com'}</p>
           </div>
         </div>
