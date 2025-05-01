@@ -68,6 +68,24 @@ const AttendanceCalendar = ({ projectId, projectName, projectResources, setProje
       const updatedProject = await ProjectService.assignResourceToProject(projectId, resourceId);
       setProjectResources(updatedProject.resources || []);
       setIsResourceModalOpen(false);
+      
+      try {
+        const startDate = startOfMonth(currentDate);
+        const endDate = endOfMonth(currentDate);
+        const days = eachDayOfInterval({ start: startDate, end: endDate });
+        
+        const updatedRecords = { ...occupationRecords };
+        Object.keys(updatedRecords).forEach(key => {
+          if (key.startsWith(`${resourceId}-`)) {
+            delete updatedRecords[key];
+          }
+        });
+        setOccupationRecords(updatedRecords);
+        
+        fetchOccupationRecords();
+      } catch (err) {
+        console.warn('Error clearing occupation rates for newly added resource:', err);
+      }
     } catch (error) {
       console.error('Error assigning resource:', error);
     } finally {
@@ -80,6 +98,14 @@ const AttendanceCalendar = ({ projectId, projectName, projectResources, setProje
       setLoading(true);
       await ProjectService.removeResourceFromProject(projectId, resourceId);
       setProjectResources(current => current.filter(r => r.id !== resourceId));
+      
+      const updatedRecords = { ...occupationRecords };
+      Object.keys(updatedRecords).forEach(key => {
+        if (key.startsWith(`${resourceId}-`)) {
+          delete updatedRecords[key];
+        }
+      });
+      setOccupationRecords(updatedRecords);
     } catch (error) {
       console.error('Error removing resource:', error);
     } finally {
