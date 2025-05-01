@@ -68,7 +68,7 @@ export const ProjectService = {
       if (!token) {
         throw new Error('No authentication token found');
       }
-
+      
       const formattedStartDate = format(startDate, 'yyyy-MM-dd');
       const formattedEndDate = format(endDate, 'yyyy-MM-dd');
       
@@ -155,6 +155,25 @@ export const ProjectService = {
       if (!response.ok) {
         throw new Error('Failed to remove resource');
       }
+      
+      try {
+        const currentDate = new Date();
+        const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+        
+        const days = [];
+        let currentDay = startDate;
+        while (currentDay <= endDate) {
+          days.push(new Date(currentDay));
+          currentDay.setDate(currentDay.getDate() + 1);
+        }
+        
+        for (const day of days) {
+          await this.updateOccupationRate(resourceId, projectId, day, 0);
+        }
+      } catch (error) {
+        console.warn('Failed to clear occupation records, but resource was removed from project');
+      }
 
       return true;
     } catch (error) {
@@ -193,6 +212,32 @@ export const ProjectService = {
       return await response.json();
     } catch (error) {
       console.error('Error updating occupation rate:', error);
+      throw error;
+    }
+  },
+  
+  async resetResourceOccupation(resourceId, projectId) {
+    try {
+      const token = this.getAuthToken();
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+      
+      const response = await fetch(`${API_URL}/resources/${resourceId}/projects/${projectId}/reset-occupation`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to reset resource occupation rates');
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error resetting resource occupation:', error);
       throw error;
     }
   }
