@@ -209,7 +209,7 @@ const AttendanceCalendar = ({ projectId, projectName, projectResources, setProje
   return (
     <div className="attendance-container rounded-3xl shadow-lg bg-emerald-600 p-6 mt-4">
       <h1 className="text-2xl font-semibold mb-4 text-white">Project Attendance</h1>
-      <div className="main-grid bg-white rounded-3xl shadow-sm p-4">
+      <div className="main-grid bg-white rounded-3xl shadow-sm p-4 text-xs ">
         <div className="calendar-controls">
           <div className="date-range">
             {format(startDate, 'dd MMM yyyy')} - {format(endDate, 'dd MMM yyyy')}

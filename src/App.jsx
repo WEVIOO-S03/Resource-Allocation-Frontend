@@ -4,6 +4,7 @@ import Auth from "./pages/auth";
 import AdminDashboard from "./pages/usersList";
 import ProjectAccessManagement from "./pages/manageProfil";
 import ProjectList from "./pages/projectList";
+import ResourcesPage from "./pages/ResourcesPage";
 import ProjectDetails from "./pages/projectDetails";
 import { isAuthenticated, isAdmin } from "./api/authService";
 
@@ -44,6 +45,15 @@ export default function App() {
           element={
             <ProtectedRoute>
               <ProjectList />
+            </ProtectedRoute>
+          } 
+        />
+
+        <Route 
+          path="/resources" 
+          element={
+            <ProtectedRoute>
+              <ResourcesPage />
             </ProtectedRoute>
           } 
         />
