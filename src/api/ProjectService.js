@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, startOfWeek, endOfWeek } from 'date-fns';
 
 const API_URL = 'http://localhost:8000/api';
 
@@ -21,7 +21,6 @@ export const ProjectService = {
         }
       });
     
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -63,53 +62,61 @@ export const ProjectService = {
   },
 
   async fetchOccupationRecords(startDate, endDate, projectId) {
-    try {
-      const token = this.getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-      
-      const formattedStartDate = format(startDate, 'yyyy-MM-dd');
-      const formattedEndDate = format(endDate, 'yyyy-MM-dd');
-      
-      const response = await fetch(
-        `${API_URL}/resources/occupation-records?startDate=${formattedStartDate}&endDate=${formattedEndDate}&projectId=${projectId}`, 
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
+  try {
+    const token = this.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found');
+    }
+    
+    const formattedStartDate = format(startOfWeek(startDate, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+    const formattedEndDate = format(endOfWeek(endDate, { weekStartsOn: 1 }), 'yyyy-MM-dd');
+    
+    const response = await fetch(
+      `${API_URL}/resources/occupation-records?startDate=${formattedStartDate}&endDate=${formattedEndDate}&projectId=${projectId}`, 
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        throw new Error(`HTTP error! status: ${response.status}`);
       }
+    );
 
-      const data = await response.json();
-      
-      console.log('data:', data);
-      const recordsMap = {};
-      if (Array.isArray(data)) {
-        data.forEach(record => {
-          if (record.resourceId && record.date) {
-            recordsMap[`${record.resourceId}-${record.date}`] = {
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    
+    const recordsMap = {};
+    if (Array.isArray(data)) {
+      data.forEach(record => {
+        if (record.resourceId && record.weekStart && record.weekEnd) {
+          const startDate = new Date(record.weekStart);
+          const endDate = new Date(record.weekEnd);
+          let currentDate = new Date(startDate);
+          
+          while (currentDate <= endDate) {
+            recordsMap[`${record.resourceId}-${format(currentDate, 'yyyy-MM-dd')}`] = {
               rate: record.occupationRate,
               updatedAt: record.updatedAt,
-              updatedBy: record.updatedBy
+              updatedBy: record.updatedBy,
+              weekStart: record.weekStart,
+              weekEnd: record.weekEnd
             };
+            currentDate.setDate(currentDate.getDate() + 1);
           }
-        });
-      }
-      
-      return recordsMap;
-    } catch (error) {
-      console.error('Error fetching occupation records:', error);
-      throw error;
+        }
+      });
     }
-  },
+    
+    return recordsMap;
+  } catch (error) {
+    console.error('Error fetching occupation records:', error);
+    throw error;
+  }
+},
 
   async assignResourceToProject(projectId, resourceId) {
     try {
@@ -161,15 +168,15 @@ export const ProjectService = {
         const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
         const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
         
-        const days = [];
-        let currentDay = startDate;
-        while (currentDay <= endDate) {
-          days.push(new Date(currentDay));
-          currentDay.setDate(currentDay.getDate() + 1);
+        const weekStarts = [];
+        let currentWeekStart = startOfWeek(startDate, { weekStartsOn: 1 });
+        while (currentWeekStart <= endDate) {
+          weekStarts.push(new Date(currentWeekStart));
+          currentWeekStart.setDate(currentWeekStart.getDate() + 7);
         }
         
-        for (const day of days) {
-          await this.updateOccupationRate(resourceId, projectId, day, 0);
+        for (const weekStart of weekStarts) {
+          await this.updateOccupationRate(resourceId, projectId, weekStart, 0);
         }
       } catch (error) {
         console.warn('Failed to clear occupation records, but resource was removed from project');
@@ -189,7 +196,8 @@ export const ProjectService = {
         throw new Error('No authentication token found');
       }
 
-      const formattedDate = format(date, 'yyyy-MM-dd');
+      const weekStart = startOfWeek(date, { weekStartsOn: 1 });
+      const formattedWeekStart = format(weekStart, 'yyyy-MM-dd');
 
       const response = await fetch(`${API_URL}/resources/${resourceId}/projects/${projectId}/occupation-records`, {
         method: 'POST',
@@ -198,7 +206,7 @@ export const ProjectService = {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          date: formattedDate,
+          date: formattedWeekStart, 
           occupationRate: rate
         })
       });

@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { format, startOfWeek } from 'date-fns';
 
 const API_URL = 'http://localhost:8000/api';
 
@@ -114,18 +114,24 @@ class ResourceService {
       const recordsMap = {};
       if (Array.isArray(data)) {
         data.forEach(record => {
-          if (record.resourceId && record.date && record.projectId) {
-            recordsMap[`${record.resourceId}-${record.projectId}-${record.date}`] = {
+          const weekStart = record.weekStart || (record.date ? startOfWeek(new Date(record.date), { weekStartsOn: 1 }).toISOString().split('T')[0] : null);
+          
+          if (record.resourceId && weekStart && record.projectId) {
+            recordsMap[`${record.resourceId}-${record.projectId}-${weekStart}`] = {
               rate: record.occupationRate,
               updatedAt: record.updatedAt,
-              updatedBy: record.updatedBy
+              updatedBy: record.updatedBy,
+              weekStart: weekStart,
+              weekEnd: record.weekEnd
             };
           }
-          if (record.resourceId && record.date) {
-            recordsMap[`${record.resourceId}-${record.date}`] = {
+          if (record.resourceId && weekStart) {
+            recordsMap[`${record.resourceId}-${weekStart}`] = {
               rate: record.occupationRate,
               updatedAt: record.updatedAt,
-              updatedBy: record.updatedBy
+              updatedBy: record.updatedBy,
+              weekStart: weekStart,
+              weekEnd: record.weekEnd
             };
           }
         });
