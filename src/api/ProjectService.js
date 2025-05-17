@@ -119,31 +119,39 @@ export const ProjectService = {
 },
 
   async assignResourceToProject(projectId, resourceId) {
-    try {
-      const token = this.getAuthToken();
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-      
-      const response = await fetch(`${API_URL}/projects/${projectId}/resources/${resourceId}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to assign resource');
-      }
-
-      return await this.fetchProject(projectId);
-    } catch (error) {
-      console.error('Error assigning resource:', error);
-      throw error;
+  try {
+    const token = this.getAuthToken();
+    if (!token) {
+      throw new Error('No authentication token found');
     }
-  },
+    
+    const response = await fetch(`${API_URL}/projects/${projectId}/resources/${resourceId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      }
+    });
 
+    if (!response.ok) {
+      throw new Error('Failed to assign resource');
+    }
+    
+    const currentDate = new Date();
+    const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+    
+    try {
+      await this.updateOccupationRate(resourceId, projectId, weekStart, 0);
+    } catch (initError) {
+      console.warn('Failed to initialize occupation rate, but resource was added to project', initError);
+    }
+
+    return await this.fetchProject(projectId);
+  } catch (error) {
+    console.error('Error assigning resource:', error);
+    throw error;
+  }
+},
   async removeResourceFromProject(projectId, resourceId) {
     try {
       const token = this.getAuthToken();
