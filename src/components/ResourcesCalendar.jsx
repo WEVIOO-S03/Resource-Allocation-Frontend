@@ -292,36 +292,37 @@ const ResourcesCalendar = () => {
   };
 
   return (
-    <div className="attendance-container rounded-3xl shadow-lg bg-emerald-600 p-6 mt-4">
+    <div className="rounded-3xl shadow-lg bg-emerald-600 p-6 mt-4 h-full flex flex-col overflow-hidden">
       <h1 className="text-2xl font-semibold mb-4 text-white">
         Resource Occupation Calendar (Weekly)
       </h1>
-      <div className="main-grid bg-white rounded-3xl shadow-sm p-4">
-        <div className="calendar-controls text-xs">
-          <div className="controls-right-resources">
-            <div className="search-bar">
+      <div className="bg-white rounded-3xl shadow-sm p-4 flex-1 flex flex-col overflow-hidden">
+        <div className="px-4 py-4 border-b border-gray-200 flex items-center justify-between gap-4 flex-wrap text-xs">
+          <div className="flex items-center gap-4">
+            <div className="min-w-[180px] max-w-[300px] flex-1">
               <input
                 type="text"
                 placeholder="Search resources..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
+                className="w-full px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs pl-8 bg-no-repeat bg-[length:1rem] bg-[0.5rem_center]"
+                style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E\")"}}
               />
             </div>
-            <div className="navigation-container text-xs">
-              <div className="year-nav">
-                <button onClick={handlePrevMonth}>&lt;</button>
-                <span>{format(currentDate, "yyyy")}</span>
-                <button onClick={handleNextMonth}>&gt;</button>
+            <div className="flex items-center gap-2 text-xs">
+              <div className="flex items-center gap-2 pr-2 border-r border-gray-200">
+                <button onClick={handlePrevMonth} className="p-1 text-gray-500 flex items-center justify-center">&lt;</button>
+                <span className="text-gray-700 min-w-12 text-center">{format(currentDate, "yyyy")}</span>
+                <button onClick={handleNextMonth} className="p-1 text-gray-500 flex items-center justify-center">&gt;</button>
               </div>
-              <div className="month-buttons">
+              <div className="flex gap-4 overflow-x-auto scrollbar-thin px-1">
                 {Array.from({ length: 12 }, (_, i) => {
                   const monthDate = new Date(currentDate.getFullYear(), i);
                   return (
                     <button
                       key={i}
-                      className={`month-btn  ${
-                        i === currentDate.getMonth() ? "active" : ""
+                      className={`px-3 py-1 text-gray-500 whitespace-nowrap relative border-none bg-transparent flex-1 text-center min-w-0 ${
+                        i === currentDate.getMonth() ? "text-indigo-600 font-medium after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-0.5 after:bg-indigo-600" : ""
                       }`}
                       onClick={() =>
                         setCurrentDate(new Date(currentDate.getFullYear(), i))
@@ -334,31 +335,30 @@ const ResourcesCalendar = () => {
               </div>
             </div>
           </div>
-          <div className="date-range text-xs">
-            {format(startDate, "dd MMM yyyy")} -{" "}
-            {format(endDate, "dd MMM yyyy")}
+          <div className="text-xs text-gray-700 min-w-[200px]">
+            {format(startDate, "dd MMM yyyy")} - {format(endDate, "dd MMM yyyy")}
           </div>
         </div>
 
-        <div className="days-header">
-          <div className="employee-column-header">
+        <div className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
+          <div className="w-[300px] flex-shrink-0 px-4 py-3 font-medium text-gray-700 bg-white border-r border-gray-200">
             Resources ({resources.length})
           </div>
-          <div className="days-row" ref={weeksRowRef}>
+          <div className="flex flex-1 overflow-x-auto scrollbar-none" ref={weeksRowRef}>
             {calendarWeeks.map((weekStart, index) => {
               const weekEnd = addDays(weekStart, 6);
               return (
                 <div
                   key={index}
-                  className={`week-header ${
-                    isColumnSelected(weekStart) ? "selected" : ""
-                  } ${isCurrentWeek(weekStart) ? "current-week" : ""}`}
+                  className={`min-w-[140px] flex flex-col items-center justify-center p-2 border-r border-gray-200 cursor-pointer hover:bg-gray-100 ${
+                    isColumnSelected(weekStart) ? "bg-gray-200" : ""
+                  } ${isCurrentWeek(weekStart) ? "bg-blue-50 border-l-2 border-r-2 border-blue-500" : ""}`}
                   onClick={() => handleColumnClick(weekStart)}
                 >
-                  <div className="week-number">
+                  <div className="font-semibold text-sm">
                     Week {format(weekStart, "w")}
                   </div>
-                  <div className="week-dates">
+                  <div className="text-xs text-gray-500">
                     {format(weekStart, "MMM d")} - {format(weekEnd, "MMM d")}
                   </div>
                 </div>
@@ -372,30 +372,32 @@ const ResourcesCalendar = () => {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <div className="departments-container">
+          <div className="flex-1 overflow-auto">
             {departments.map((dept, deptIndex) => (
-              <div key={deptIndex} className="department-section">
-                <div className="department-header">{dept.name}</div>
+              <div key={deptIndex} className="flex flex-col">
+                <div className="py-2 px-4 bg-white font-medium text-emerald-500 text-sm border-b border-gray-200">
+                  {dept.name}
+                </div>
                 {dept.employees.map((emp, empIndex) => (
                   <React.Fragment key={empIndex}>
                     {/* Employee Row */}
-                    <div className="employee-attendance-row">
+                    <div className="flex min-h-14 border-b border-gray-200">
                       <div
-                        className="employee-info-cell cursor-pointer hover:bg-gray-100"
+                        className="w-[300px] flex-shrink-0 px-4 py-3 flex items-center bg-white border-r border-gray-200 sticky left-0 z-10 cursor-pointer hover:bg-gray-100"
                         onClick={() => toggleRowExpansion(emp.id)}
                       >
-                        <div className="flex items-center">
+                        <div className="flex items-center w-full">
                           <img
                             src={
                               emp.avatar ||
                               `https://i.pravatar.cc/150?img=${emp.id}`
                             }
                             alt={emp.fullName}
-                            className="employee-avatar"
+                            className="w-8 h-8 rounded-full mr-1.5"
                           />
-                          <div className="employee-info ml-3">
-                            <div className="employee-name">{emp.fullName}</div>
-                            <div className="employee-title">{emp.position}</div>
+                          <div className="ml-3">
+                            <div className="font-medium text-gray-900 text-sm">{emp.fullName}</div>
+                            <div className="text-xs text-gray-500 mt-0.5">{emp.position}</div>
                             <div className="text-xs text-gray-500">
                               Projects: {emp.projects?.length || 0} |
                               Availability: {emp.availability || 0}%
@@ -407,7 +409,7 @@ const ResourcesCalendar = () => {
                         </div>
                       </div>
                       <div
-                        className="attendance-cells bg-white"
+                        className="flex flex-1 overflow-x-auto scrollbar-none bg-white"
                         ref={(el) => {
                           if (el) {
                             attendanceRowsRef.current[
@@ -419,15 +421,15 @@ const ResourcesCalendar = () => {
                         {calendarWeeks.map((weekStart, weekIndex) => (
                           <div
                             key={weekIndex}
-                            className={`status-cell h-auto status-${getAttendanceStatus(
-                              emp.id,
-                              weekStart
-                            )} ${
-                              isCurrentWeek(weekStart) ? "current-week" : ""
-                            } ${isColumnSelected(weekStart) ? "selected" : ""}`}
+                            className={`min-w-[140px] h-auto flex flex-col items-center justify-center border-r border-gray-200 cursor-pointer hover:bg-gray-100 ${
+                              isCurrentWeek(weekStart) ? "bg-blue-50 border-l-2 border-r-2 border-blue-500" : ""
+                            } ${isColumnSelected(weekStart) ? "bg-gray-200" : ""}`}
                             onClick={(e) => handleCellClick(emp, weekStart, null, e)}
                           >
-                            <div className="status-dot">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold ${
+                              getAttendanceStatus(emp.id, weekStart) === "full" ? "bg-green-500" :
+                              getAttendanceStatus(emp.id, weekStart) === "moyen" ? "bg-yellow-500" : "bg-red-500"
+                            }`}>
                               {getOccupationRate(emp.id, weekStart)}%
                             </div>
                           </div>
@@ -441,12 +443,12 @@ const ResourcesCalendar = () => {
                       emp.projects.map((project, projectIndex) => (
                         <div
                           key={`${emp.id}-project-${project.id}`}
-                          className="employee-attendance-row project-row"
+                          className="flex min-h-14 border-b border-gray-200"
                         >
-                          <div className="employee-info-cell project-info-cell bg-emerald-50 border-l-4 border-emerald-500">
+                          <div className="w-[300px] flex-shrink-0 px-4 py-3 flex items-center bg-emerald-50 border-l-4 border-emerald-500 border-r border-gray-200 sticky left-0 z-10">
                             <div className="flex items-center w-full pl-8">
-                              <div className="project-info">
-                                <div className="project-name text-emerald-700 font-medium">
+                              <div>
+                                <div className="text-emerald-700 font-medium text-[0.95rem]">
                                   {project.name}
                                 </div>
                                 <div className="text-xs text-gray-500">
@@ -456,7 +458,7 @@ const ResourcesCalendar = () => {
                             </div>
                           </div>
                           <div
-                            className="attendance-cells bg-emerald-50"
+                            className="flex flex-1 overflow-x-auto scrollbar-none bg-emerald-50"
                             ref={(el) => {
                               if (el) {
                                 const rowIndex =
@@ -471,26 +473,22 @@ const ResourcesCalendar = () => {
                             {calendarWeeks.map((weekStart, weekIndex) => (
                               <div
                                 key={weekIndex}
-                                className={`status-cell status-${getAttendanceStatus(
-                                  emp.id,
-                                  weekStart,
-                                  project.id
-                                )} ${
-                                  isCurrentWeek(weekStart) ? "current-week" : ""
-                                } ${
-                                  isColumnSelected(weekStart) ? "selected" : ""
-                                }`}
+                                className={`min-w-[140px] flex flex-col items-center justify-center border-r border-gray-200 cursor-pointer hover:bg-gray-100 ${
+                                  isCurrentWeek(weekStart) ? "bg-blue-50 border-l-2 border-r-2 border-blue-500" : ""
+                                } ${isColumnSelected(weekStart) ? "bg-gray-200" : ""}`}
                                 onClick={(e) =>
                                   handleCellClick(emp, weekStart, project.id, e)
                                 }
                               >
-                                <div className="status-dot">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold ${
+                                  getAttendanceStatus(emp.id, weekStart, project.id) === "full" ? "bg-green-500" :
+                                  getAttendanceStatus(emp.id, weekStart, project.id) === "moyen" ? "bg-yellow-500" : "bg-red-500"
+                                }`}>
                                   {getOccupationRate(
                                     emp.id,
                                     weekStart,
                                     project.id
-                                  )}
-                                  %
+                                  )}%
                                 </div>
                               </div>
                             ))}
@@ -506,7 +504,7 @@ const ResourcesCalendar = () => {
 
         {popupInfo.visible && popupInfo.employee && popupInfo.week && (
           <div 
-            className="working-time-popup bg-white rounded-lg shadow-lg p-4 absolute z-20 border border-gray-200"
+            className="bg-white rounded-lg shadow-lg p-4 absolute z-20 border border-gray-200 working-time-popup"
             style={{ 
               top: `${popupInfo.y}px`, 
               left: `${popupInfo.x}px`, 
@@ -531,35 +529,35 @@ const ResourcesCalendar = () => {
             <div className="border-t border-gray-200 pt-2">
               {popupInfo.data.type === 'project' ? (
                 <>
-                  <div className="working-time-entry flex justify-between py-1">
-                    <span className="working-time-label text-gray-600">Project:</span>
-                    <span className="working-time-value font-medium">{popupInfo.data.projectName}</span>
+                  <div className="flex justify-between py-1">
+                    <span className="text-gray-600">Project:</span>
+                    <span className="font-medium">{popupInfo.data.projectName}</span>
                   </div>
-                  <div className="working-time-entry flex justify-between py-1">
-                    <span className="working-time-label text-gray-600">Week:</span>
-                    <span className="working-time-value">
+                  <div className="flex justify-between py-1">
+                    <span className="text-gray-600">Week:</span>
+                    <span>
                       {popupInfo.data.weekStart} to {popupInfo.data.weekEnd}
                     </span>
                   </div>
-                  <div className="working-time-entry flex justify-between py-1">
-                    <span className="working-time-label text-gray-600">Occupation:</span>
-                    <span className="working-time-value font-medium">
+                  <div className="flex justify-between py-1">
+                    <span className="text-gray-600">Occupation:</span>
+                    <span className="font-medium">
                       {popupInfo.data.occupationRate}%
                     </span>
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="working-time-entry flex justify-between py-1">
-                    <span className="working-time-label text-gray-600">Week:</span>
-                    <span className="working-time-value">
+                  <div className="flex justify-between py-1">
+                    <span className="text-gray-600">Week:</span>
+                    <span>
                       {popupInfo.data.weekStart} to {popupInfo.data.weekEnd}
                     </span>
                   </div>
                   
-                  <div className="working-time-entry flex justify-between py-1">
-                    <span className="working-time-label text-gray-600">Projects Sum:</span>
-                    <span className="working-time-value font-medium">
+                  <div className="flex justify-between py-1">
+                    <span className="text-gray-600">Projects Sum:</span>
+                    <span className="font-medium">
                       {popupInfo.data.projectSum}%
                     </span>
                   </div>
@@ -574,7 +572,6 @@ const ResourcesCalendar = () => {
               >
                 Close
               </button>
-             
             </div>
           </div>
         )}
