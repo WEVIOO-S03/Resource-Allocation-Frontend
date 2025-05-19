@@ -13,6 +13,8 @@ import {
   addDays,
 } from 'date-fns';
 import ResourceService from '../api/resourceService';
+import MonthNavigator from './calendar/MonthNavigator';
+import SearchInput from './calendar/SearchInput';
 
 const ResourcesCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -299,45 +301,18 @@ const ResourcesCalendar = () => {
       <div className="bg-white rounded-3xl shadow-sm p-4 flex-1 flex flex-col overflow-hidden">
         <div className="px-4 py-4 border-b border-gray-200 flex items-center justify-between gap-4 flex-wrap text-xs">
           <div className="flex items-center gap-4">
-            <div className="min-w-[180px] max-w-[300px] flex-1">
-              <input
-                type="text"
-                placeholder="Search resources..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs pl-8 bg-no-repeat bg-[length:1rem] bg-[0.5rem_center]"
-                style={{backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E\")"}}
-              />
-            </div>
-            <div className="flex items-center gap-2 text-xs">
-              <div className="flex items-center gap-2 pr-2 border-r border-gray-200">
-                <button onClick={handlePrevMonth} className="p-1 text-gray-500 flex items-center justify-center">&lt;</button>
-                <span className="text-gray-700 min-w-12 text-center">{format(currentDate, "yyyy")}</span>
-                <button onClick={handleNextMonth} className="p-1 text-gray-500 flex items-center justify-center">&gt;</button>
-              </div>
-              <div className="flex gap-4 overflow-x-auto scrollbar-thin px-1">
-                {Array.from({ length: 12 }, (_, i) => {
-                  const monthDate = new Date(currentDate.getFullYear(), i);
-                  return (
-                    <button
-                      key={i}
-                      className={`px-3 py-1 text-gray-500 whitespace-nowrap relative border-none bg-transparent flex-1 text-center min-w-0 ${
-                        i === currentDate.getMonth() ? "text-indigo-600 font-medium after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:right-0 after:h-0.5 after:bg-indigo-600" : ""
-                      }`}
-                      onClick={() =>
-                        setCurrentDate(new Date(currentDate.getFullYear(), i))
-                      }
-                    >
-                      {format(monthDate, "MMM")}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <SearchInput 
+              searchQuery={searchQuery} 
+              setSearchQuery={setSearchQuery} 
+              placeholder="Search resources..."
+              withIcon={true}
+            />
+            <MonthNavigator 
+              currentDate={currentDate} 
+              setCurrentDate={setCurrentDate} 
+            />
           </div>
-          <div className="text-xs text-gray-700 min-w-[200px]">
-            {format(startDate, "dd MMM yyyy")} - {format(endDate, "dd MMM yyyy")}
-          </div>
+          
         </div>
 
         <div className="flex bg-white border-b border-gray-200 sticky top-0 z-20">

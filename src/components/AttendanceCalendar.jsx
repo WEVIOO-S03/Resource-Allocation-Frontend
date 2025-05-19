@@ -14,6 +14,8 @@ import {
   isSameWeek,
 } from "date-fns";
 import ProjectService from "../api/ProjectService";
+import MonthNavigator from "../components/calendar/MonthNavigator";
+import SearchInput from "../components/calendar/SearchInput";
 
 const AttendanceCalendar = ({
   projectId,
@@ -110,43 +112,43 @@ const AttendanceCalendar = ({
   };
 
   const handleResourceAssignment = async (resourceId) => {
-  if (!resourceId) {
-    console.error("No resource ID provided");
-    return;
-  }
+    if (!resourceId) {
+      console.error("No resource ID provided");
+      return;
+    }
 
-  try {
-    setLoading(true);
-    const updatedProject = await ProjectService.assignResourceToProject(
-      projectId,
-      resourceId
-    );
-    setProjectResources(updatedProject.resources || []);   
-    await fetchOccupationRecords();
-    
-    setIsResourceModalOpen(false);
-  } catch (error) {
-    console.error("Error assigning resource:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+      const updatedProject = await ProjectService.assignResourceToProject(
+        projectId,
+        resourceId
+      );
+      setProjectResources(updatedProject.resources || []);   
+      await fetchOccupationRecords();
+      
+      setIsResourceModalOpen(false);
+    } catch (error) {
+      console.error("Error assigning resource:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleResourceRemoval = async (resourceId) => {
-  try {
-    setLoading(true);
-    await ProjectService.removeResourceFromProject(projectId, resourceId);
-    setProjectResources((current) =>
-      current.filter((r) => r.id !== resourceId)
-    );
-    
-    await fetchOccupationRecords();
-  } catch (error) {
-    console.error("Error removing resource:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+      await ProjectService.removeResourceFromProject(projectId, resourceId);
+      setProjectResources((current) =>
+        current.filter((r) => r.id !== resourceId)
+      );
+      
+      await fetchOccupationRecords();
+    } catch (error) {
+      console.error("Error removing resource:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCellClick = (employee, weekStartDate) => {
     const cellId = `${employee.id}-${format(weekStartDate, "yyyy-MM-dd")}`;
@@ -236,9 +238,6 @@ const AttendanceCalendar = ({
     const record = occupationRecords[recordKey];
     return record ? record.rate : 0;
   };
-
-  const handlePrevMonth = () => setCurrentDate(subMonths(currentDate, 1));
-  const handleNextMonth = () => setCurrentDate(addMonths(currentDate, 1));
 
   const handleColumnClick = (weekStart) => {
     setSelectedColumn(weekStart);
@@ -349,65 +348,17 @@ const AttendanceCalendar = ({
                 Add Resources
               </button>
 
-              <div className="min-w-[180px] max-w-[300px] flex-1">
-                <input
-                  type="text"
-                  placeholder="Search project resources..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+              <SearchInput
+                searchQuery={searchQuery} 
+                setSearchQuery={setSearchQuery} 
+                placeholder="Search project resources..." 
+              />
             </div>
 
-            <div className="flex items-center justify-between flex-wrap">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 pr-2 border-r border-gray-200">
-                  <button
-                    onClick={handlePrevMonth}
-                    className="px-1.5 py-1 hover:bg-gray-100 rounded"
-                  >
-                    &lt;
-                  </button>
-                  <span className="text-sm text-gray-700 min-w-[3rem] text-center">
-                    {format(currentDate, "yyyy")}
-                  </span>
-                  <button
-                    onClick={handleNextMonth}
-                    className="px-1.5 py-1 hover:bg-gray-100 rounded"
-                  >
-                    &gt;
-                  </button>
-                </div>
-                <div className="flex gap-4 overflow-x-auto scrollbar-thin py-1">
-                  {Array.from({ length: 12 }, (_, i) => {
-                    const monthDate = new Date(currentDate.getFullYear(), i);
-                    return (
-                      <button
-                        key={i}
-                        className={`text-sm px-2 py-1 whitespace-nowrap relative border-none bg-transparent flex-1 text-center ${
-                          i === currentDate.getMonth()
-                            ? "text-blue-600 font-medium"
-                            : "text-gray-500"
-                        }`}
-                        onClick={() =>
-                          setCurrentDate(new Date(currentDate.getFullYear(), i))
-                        }
-                      >
-                        {format(monthDate, "MMM")}
-                        {i === currentDate.getMonth() && (
-                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="text-sm text-gray-700 min-w-[200px]">
-                {format(startDate, "dd MMM yyyy")} -{" "}
-                {format(endDate, "dd MMM yyyy")}
-              </div>
-            </div>
+            <MonthNavigator 
+              currentDate={currentDate} 
+              setCurrentDate={setCurrentDate} 
+            />
           </div>
         </div>
 
