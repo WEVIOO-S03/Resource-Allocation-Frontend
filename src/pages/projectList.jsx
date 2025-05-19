@@ -11,7 +11,7 @@ import {
   faComment
 } from '@fortawesome/free-solid-svg-icons';
 import { fetchUserProjects } from '../api/userService';
-import Layout from '../components/Layout';
+import Layout from '../components/common/Layout';
 
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);

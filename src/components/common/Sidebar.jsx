@@ -10,8 +10,8 @@ import {
   faSignOutAlt,
   faCalendarAlt
 } from '@fortawesome/free-solid-svg-icons';
-import { getCurrentUser, logout } from '../api/authService';
-import logo from '../assets/logo.png';
+import { getCurrentUser, logout } from '../../api/authService';
+import logo from '../../assets/logo.png';
 
 const Sidebar = () => {
   const location = useLocation();

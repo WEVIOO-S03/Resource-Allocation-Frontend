@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ResourcesCalendar from '../components/ResourcesCalendar';
 import ResourceService from '../api/resourceService';
-import Layout from '../components/Layout';
+import Layout from '../components/common/Layout';
 
 
 const ResourcesPage = () => {

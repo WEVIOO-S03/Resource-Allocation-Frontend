@@ -5,8 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import StatsCard from '../components/Cards';
 import UserTable from '../components/UserTable';
-import Pagination from '../components/Pagination';
-import Layout from '../components/Layout';
+import Pagination from '../components/common/Pagination';
+import Layout from '../components/common/Layout';
 
 
 import { fetchUsers } from '../api/userService';
