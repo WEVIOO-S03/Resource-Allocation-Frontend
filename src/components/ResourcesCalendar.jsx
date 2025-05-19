@@ -19,8 +19,6 @@ import SearchInput from './calendar/SearchInput';
 const ResourcesCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [selectedWeek, setSelectedWeek] = useState(null);
   const [selectedColumn, setSelectedColumn] = useState(null);
   const [loading, setLoading] = useState(false);
   const [resources, setResources] = useState([]);
@@ -29,15 +27,6 @@ const ResourcesCalendar = () => {
   const weeksRowRef = useRef(null);
   const attendanceRowsRef = useRef([]);
   const [expandedRows, setExpandedRows] = useState({});
-  const [popupInfo, setPopupInfo] = useState({
-    visible: false,
-    x: 0,
-    y: 0,
-    employee: null,
-    week: null,
-    projectId: null,
-    data: null
-  });
 
   const toggleRowExpansion = (employeeId) => {
     setExpandedRows((prev) => ({
@@ -45,19 +34,6 @@ const ResourcesCalendar = () => {
       [employeeId]: !prev[employeeId],
     }));
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (popupInfo.visible && !event.target.closest('.working-time-popup')) {
-        setPopupInfo(prev => ({ ...prev, visible: false }));
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [popupInfo.visible]);
 
   useEffect(() => {
     fetchResources();
@@ -110,62 +86,6 @@ const ResourcesCalendar = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleCellClick = (employee, week, projectId = null, event) => {
-    const x = event.clientX;
-    const y = event.clientY;
-    
-    setSelectedEmployee(employee);
-    setSelectedWeek(week);
-
-    let popupData = {};
-    if (projectId) {
-      const project = employee.projects.find((p) => p.id === projectId);
-      const projectName = project ? project.name : "Unknown Project";
-      const weekStartFormatted = format(week, "yyyy-MM-dd");
-      const weekEndFormatted = format(addDays(week, 6), "yyyy-MM-dd");
-      const recordKey = `${employee.id}-${projectId}-${weekStartFormatted}`;
-      const projectRecord = projectOccupationRecords[recordKey];
-      const occupationRate = projectRecord ? projectRecord.rate : 0;
-
-      popupData = {
-        type: 'project',
-        projectName,
-        weekStart: weekStartFormatted,
-        weekEnd: weekEndFormatted,
-        occupationRate
-      };
-    } else {
-      const weekStartFormatted = format(week, "yyyy-MM-dd");
-      const weekEndFormatted = format(addDays(week, 6), "yyyy-MM-dd");
-      const recordKey = `${employee.id}-${weekStartFormatted}`;
-      const currentRecord = occupationRecords[recordKey];
-      const projectSum = calculateTotalProjectOccupation(employee.id, week);
-      const storedTotal = currentRecord ? currentRecord.rate : 0;
-
-      popupData = {
-        type: 'employee',
-        weekStart: weekStartFormatted,
-        weekEnd: weekEndFormatted,
-        storedTotal,
-        projectSum
-      };
-    }
-
-    setPopupInfo({
-      visible: true,
-      x,
-      y,
-      employee,
-      week,
-      projectId,
-      data: popupData
-    });
-  };
-
-  const closePopup = () => {
-    setPopupInfo(prev => ({ ...prev, visible: false }));
   };
 
   const calculateTotalProjectOccupation = (employeeId, weekStart) => {
@@ -399,7 +319,7 @@ const ResourcesCalendar = () => {
                             className={`min-w-[140px] h-auto flex flex-col items-center justify-center border-r border-gray-200 cursor-pointer hover:bg-gray-100 ${
                               isCurrentWeek(weekStart) ? "bg-blue-50 border-l-2 border-r-2 border-blue-500" : ""
                             } ${isColumnSelected(weekStart) ? "bg-gray-200" : ""}`}
-                            onClick={(e) => handleCellClick(emp, weekStart, null, e)}
+                            
                           >
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold ${
                               getAttendanceStatus(emp.id, weekStart) === "full" ? "bg-green-500" :
@@ -451,9 +371,6 @@ const ResourcesCalendar = () => {
                                 className={`min-w-[140px] flex flex-col items-center justify-center border-r border-gray-200 cursor-pointer hover:bg-gray-100 ${
                                   isCurrentWeek(weekStart) ? "bg-blue-50 border-l-2 border-r-2 border-blue-500" : ""
                                 } ${isColumnSelected(weekStart) ? "bg-gray-200" : ""}`}
-                                onClick={(e) =>
-                                  handleCellClick(emp, weekStart, project.id, e)
-                                }
                               >
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold ${
                                   getAttendanceStatus(emp.id, weekStart, project.id) === "full" ? "bg-green-500" :
@@ -477,79 +394,7 @@ const ResourcesCalendar = () => {
           </div>
         )}
 
-        {popupInfo.visible && popupInfo.employee && popupInfo.week && (
-          <div 
-            className="bg-white rounded-lg shadow-lg p-4 absolute z-20 border border-gray-200 working-time-popup"
-            style={{ 
-              top: `${popupInfo.y}px`, 
-              left: `${popupInfo.x}px`, 
-              transform: 'translate(-50%, -100%)',
-              minWidth: '280px'
-            }}
-          >
-            <div className="flex justify-between items-center mb-3">
-              <h4 className="font-semibold text-gray-800">
-                {popupInfo.employee.fullName} - {format(popupInfo.week, 'MMM d, yyyy')}
-              </h4>
-              <button 
-                className="text-gray-500 hover:text-gray-700"
-                onClick={closePopup}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="border-t border-gray-200 pt-2">
-              {popupInfo.data.type === 'project' ? (
-                <>
-                  <div className="flex justify-between py-1">
-                    <span className="text-gray-600">Project:</span>
-                    <span className="font-medium">{popupInfo.data.projectName}</span>
-                  </div>
-                  <div className="flex justify-between py-1">
-                    <span className="text-gray-600">Week:</span>
-                    <span>
-                      {popupInfo.data.weekStart} to {popupInfo.data.weekEnd}
-                    </span>
-                  </div>
-                  <div className="flex justify-between py-1">
-                    <span className="text-gray-600">Occupation:</span>
-                    <span className="font-medium">
-                      {popupInfo.data.occupationRate}%
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex justify-between py-1">
-                    <span className="text-gray-600">Week:</span>
-                    <span>
-                      {popupInfo.data.weekStart} to {popupInfo.data.weekEnd}
-                    </span>
-                  </div>
-                  
-                  <div className="flex justify-between py-1">
-                    <span className="text-gray-600">Projects Sum:</span>
-                    <span className="font-medium">
-                      {popupInfo.data.projectSum}%
-                    </span>
-                  </div>
-                </>
-              )}
-            </div>
-
-            <div className="mt-3 flex justify-end space-x-2">
-              <button 
-                className="px-3 py-1 text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                onClick={closePopup}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        )}
+        
       </div>
     </div>
   );
