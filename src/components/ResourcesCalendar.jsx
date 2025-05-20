@@ -15,6 +15,8 @@ import {
 import ResourceService from '../api/resourceService';
 import MonthNavigator from './calendar/MonthNavigator';
 import SearchInput from './calendar/SearchInput';
+import CalendarHeader from './calendar/CalendarHeader';
+
 
 const ResourcesCalendar = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -235,32 +237,17 @@ const ResourcesCalendar = () => {
           
         </div>
 
-        <div className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
-          <div className="w-[300px] flex-shrink-0 px-4 py-3 font-medium text-gray-700 bg-white border-r border-gray-200">
-            Resources ({resources.length})
-          </div>
-          <div className="flex flex-1 overflow-x-auto scrollbar-none" ref={weeksRowRef}>
-            {calendarWeeks.map((weekStart, index) => {
-              const weekEnd = addDays(weekStart, 6);
-              return (
-                <div
-                  key={index}
-                  className={`min-w-[140px] flex flex-col items-center justify-center p-2 border-r border-gray-200 cursor-pointer hover:bg-gray-100 ${
-                    isColumnSelected(weekStart) ? "bg-gray-200" : ""
-                  } ${isCurrentWeek(weekStart) ? "bg-blue-50 border-l-2 border-r-2 border-blue-500" : ""}`}
-                  onClick={() => handleColumnClick(weekStart)}
-                >
-                  <div className="font-semibold text-sm">
-                    Week {format(weekStart, "w")}
-                  </div>
-                  <div className="text-xs text-gray-500">
-                    {format(weekStart, "MMM d")} - {format(weekEnd, "MMM d")}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <CalendarHeader
+        title="Resources"
+        count={resources.length}
+        calendarWeeks={calendarWeeks}
+        weeksRowRef={weeksRowRef}
+        handleColumnClick={handleColumnClick}
+        isColumnSelected={isColumnSelected}
+        isCurrentWeek={isCurrentWeek}
+        minWeekWidth="140px"
+        weekHeaderFormat="detailed"
+      />
 
         {loading ? (
           <div className="flex justify-center items-center py-8">
