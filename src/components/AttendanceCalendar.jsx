@@ -16,6 +16,7 @@ import {
 import ProjectService from "../api/ProjectService";
 import MonthNavigator from "../components/calendar/MonthNavigator";
 import SearchInput from "../components/calendar/SearchInput";
+import CalendarHeader from "./calendar/CalendarHeader";
 
 const AttendanceCalendar = ({
   projectId,
@@ -239,15 +240,13 @@ const AttendanceCalendar = ({
     return record ? record.rate : 0;
   };
 
-  const handleColumnClick = (weekStart) => {
-    setSelectedColumn(weekStart);
+  const handleColumnClick = (week) => {
+    setSelectedColumn(week);
   };
 
-  const isColumnSelected = (weekStart) => {
+  const isColumnSelected = (week) => {
     return (
-      selectedColumn &&
-      format(startOfWeek(selectedColumn, { weekStartsOn: 1 }), "yyyy-MM-dd") ===
-        format(weekStart, "yyyy-MM-dd")
+      selectedColumn && isSameWeek(selectedColumn, week, { weekStartsOn: 1 })
     );
   };
 
@@ -308,12 +307,6 @@ const AttendanceCalendar = ({
     };
   }, []);
 
-  const isTodayInWeek = (weekStart) => {
-    const today = new Date();
-    const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
-    return today >= weekStart && today <= weekEnd;
-  };
-
   const isCurrentWeek = (weekStart) => {
     const today = new Date();
     const weekEnd = addDays(weekStart, 6);
@@ -362,42 +355,27 @@ const AttendanceCalendar = ({
           </div>
         </div>
 
-        <div className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
-          <div className="w-[300px] flex-shrink-0 p-3 font-medium text-gray-700 bg-white border-r border-gray-200">
-            Project Resources ({projectResources.length})
-          </div>
-          <div className="flex overflow-x-auto scrollbar-thin" ref={weeksRowRef}>
-            {calendarWeeks.map((weekStart, index) => {
-              const weekEnd = endOfWeek(weekStart, { weekStartsOn: 1 });
-              return (
-                <div
-                  key={index}
-                  className={`min-w-[100px] text-center p-2 border-r border-gray-200 bg-gray-50 cursor-pointer ${
-                    isColumnSelected(weekStart) ? "bg-gray-200" : ""
-                  } ${isCurrentWeek(weekStart) ? "bg-blue-50 border-l-2 border-r-2 border-blue-400" : ""}`}
-                  onClick={() => handleColumnClick(weekStart)}
-                >
-                  <div className="font-bold">
-                    {format(weekStart, "d")} - {format(weekEnd, "d")}
-                  </div>
-                  <div className="text-gray-500 text-xs">
-                    Week {format(weekStart, "w")}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
+        <CalendarHeader
+          title="Resources"
+          count={projectResources.length}  
+          calendarWeeks={calendarWeeks}
+          weeksRowRef={weeksRowRef}
+          handleColumnClick={handleColumnClick}
+          isColumnSelected={isColumnSelected}
+          isCurrentWeek={isCurrentWeek}
+          minWeekWidth="140px"
+          weekHeaderFormat="detailed"
+        />
 
         <div className="flex-1 overflow-auto">
           {departments.map((dept, deptIndex) => (
             <div key={deptIndex} className="flex flex-col">
-              <div className="p-2 bg-white font-medium text-emerald-600 text-sm border-b border-gray-200">
+              <div className="py-2 px-4 bg-white font-medium text-emerald-500 text-sm border-b border-gray-200">
                 {dept.name}
               </div>
               {dept.employees.map((emp, empIndex) => (
                 <div key={empIndex} className="flex min-h-14 border-b border-gray-200">
-                  <div className="w-[300px] flex-shrink-0 p-3 flex items-center bg-white border-r border-gray-200 sticky left-0 z-10">
+                  <div className="w-[300px] flex-shrink-0 px-4 py-3 flex items-center bg-white border-r border-gray-200 sticky left-0 z-10">
                     <div className="flex items-center justify-between w-full">
                       <div className="flex items-center">
                         <img
@@ -454,41 +432,35 @@ const AttendanceCalendar = ({
                       )}`;
                       const isEditing = editingCell === cellId;
                       const attendanceStatus = getAttendanceStatus(emp.id, weekStart);
-                      const bgColor = 
-                        attendanceStatus === "full" ? "bg-green-50" : 
-                        attendanceStatus === "moyen" ? "bg-yellow-50" : "bg-red-50";
-                      const dotColor = 
-                        attendanceStatus === "full" ? "bg-green-500" : 
-                        attendanceStatus === "moyen" ? "bg-yellow-500" : "bg-red-500";
-
+                      
                       return (
                         <div
                           key={weekIndex}
-                          className={`min-w-[100px] h-[60px] flex flex-col justify-center items-center border-r border-gray-200 cursor-pointer ${bgColor}
-                            ${isTodayInWeek(weekStart) ? "bg-green-50" : ""}
-                            ${isCurrentWeek(weekStart) ? "bg-blue-50 border-l-2 border-r-2 border-blue-400" : ""}
-                            ${isColumnSelected(weekStart) ? "bg-gray-100" : ""}
-                          `}
+                          className={`min-w-[140px] h-auto flex flex-col items-center justify-center border-r border-gray-200 cursor-pointer hover:bg-gray-100 
+                            ${isCurrentWeek(weekStart) ? "bg-blue-50 border-l-2 border-r-2 border-blue-500" : ""}
+                            ${isColumnSelected(weekStart) ? "bg-gray-200" : ""}`}
                           onClick={() => handleCellClick(emp, weekStart)}
                         >
-                          <div className={`w-2 h-2 rounded-full mb-1 ${dotColor}`} />
-                          <div className="text-sm font-medium">
-                            {isEditing ? (
-                              <input
-                                ref={inputRef}
-                                type="number"
-                                min="0"
-                                max="100"
-                                value={editValue}
-                                onChange={(e) => setEditValue(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                onBlur={handleSaveRate}
-                                className="w-16 text-center border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                              />
-                            ) : (
-                              `${getOccupationRate(emp.id, weekStart)}%`
-                            )}
-                          </div>
+                          {isEditing ? (
+                            <input
+                              ref={inputRef}
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={editValue}
+                              onChange={(e) => setEditValue(e.target.value)}
+                              onKeyDown={handleKeyDown}
+                              onBlur={handleSaveRate}
+                              className="w-16 text-center border rounded-md p-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                          ) : (
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold ${
+                              attendanceStatus === "full" ? "bg-green-500" :
+                              attendanceStatus === "moyen" ? "bg-yellow-500" : "bg-red-500"
+                            }`}>
+                              {getOccupationRate(emp.id, weekStart)}%
+                            </div>
+                          )}
                         </div>
                       );
                     })}
