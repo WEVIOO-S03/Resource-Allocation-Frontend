@@ -161,7 +161,7 @@ const ResourceDetailsPage = () => {
   return (
         <Layout >
     
-    <div className="rounded-3xl shadow-lg bg-emerald-600 p-6 mt-4 h-full flex flex-col overflow-hidden">
+      <div className="rounded-3xl shadow-lg bg-emerald-600 p-6 mt-4 h-full flex flex-col overflow-hidden">
       <h1 className="text-2xl font-semibold mb-4 text-white">
         Resource Details
       </h1>
@@ -222,34 +222,35 @@ const ResourceDetailsPage = () => {
 
             
             <CalendarHeader
-              title="Weekly Occupation"
-              count={resource.projects?.length || 0}
-              calendarWeeks={calendarWeeks}
-              weeksRowRef={weeksRowRef}
-              handleColumnClick={handleColumnClick}
-              isColumnSelected={isColumnSelected}
-              isCurrentWeek={isCurrentWeek}
-              minWeekWidth="140px"
-              weekHeaderFormat="detailed"
-            />
+          title="Weekly Occupation"
+          count={resource.projects?.length || 0}
+          calendarWeeks={calendarWeeks}
+          weeksRowRef={weeksRowRef}
+          handleColumnClick={handleColumnClick}
+          isColumnSelected={isColumnSelected}
+          isCurrentWeek={isCurrentWeek}
+          minWeekWidth="140px"
+          weekHeaderFormat="detailed"
+          scrollRef={attendanceRowsRef} 
+        />
 
            
             <div className="flex-1">
-              <ResourceCalendarRow
-                employee={resource}
-                expandedRows={expandedRows}
-                toggleRowExpansion={toggleRowExpansion}
-                calendarWeeks={calendarWeeks}
-                getAttendanceStatus={getAttendanceStatus}
-                getOccupationRate={getOccupationRate}
-                isCurrentWeek={isCurrentWeek}
-                isColumnSelected={isColumnSelected}
-                deptIndex={0}
-                empIndex={0}
-                attendanceRowsRef={attendanceRowsRef}
-              />
-            </div>
-
+          <ResourceCalendarRow
+            employee={resource}
+            expandedRows={expandedRows}
+            toggleRowExpansion={toggleRowExpansion}
+            calendarWeeks={calendarWeeks}
+            getAttendanceStatus={getAttendanceStatus}
+            getOccupationRate={getOccupationRate}
+            isCurrentWeek={isCurrentWeek}
+            isColumnSelected={isColumnSelected}
+            deptIndex={0}
+            empIndex={0}
+            attendanceRowsRef={attendanceRowsRef}
+            weeksRowRef={weeksRowRef}
+          />
+        </div>
            
             <div className="px-6 py-5 border-t border-gray-200">
               <h3 className="text-lg font-semibold mb-4">Skills</h3>

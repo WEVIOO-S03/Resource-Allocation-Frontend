@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from "react-router-dom";
-import { format } from 'date-fns';
 
 const ResourceCalendarRow = ({
   employee,
@@ -13,8 +12,37 @@ const ResourceCalendarRow = ({
   isColumnSelected,
   deptIndex,
   empIndex,
-  attendanceRowsRef
+  attendanceRowsRef,
+  weeksRowRef
 }) => {
+
+     useEffect(() => {
+    const rowElement = 
+      attendanceRowsRef.current[deptIndex * (employee.projects?.length || 1) + empIndex];
+    
+    if (rowElement && weeksRowRef?.current) {
+      const handleRowScroll = () => {
+        if (weeksRowRef.current) {
+          weeksRowRef.current.scrollLeft = rowElement.scrollLeft;
+        }
+        
+        if (attendanceRowsRef.current) {
+          attendanceRowsRef.current.forEach(ref => {
+            if (ref && ref !== rowElement) {
+              ref.scrollLeft = rowElement.scrollLeft;
+            }
+          });
+        }
+      };
+
+      rowElement.addEventListener('scroll', handleRowScroll);
+      
+      return () => {
+        rowElement.removeEventListener('scroll', handleRowScroll);
+      };
+    }
+  }, [deptIndex, empIndex, employee.projects, attendanceRowsRef, weeksRowRef]);
+
   return (
     <React.Fragment>
       {/* Employee Row */}
@@ -54,7 +82,7 @@ const ResourceCalendarRow = ({
             </div>
           </div>
           <div
-            className="flex flex-1 overflow-x-auto scrollbar-none bg-white"
+            className="flex flex-1 overflow-x-auto bg-white"
             ref={(el) => {
               if (el) {
                 attendanceRowsRef.current[

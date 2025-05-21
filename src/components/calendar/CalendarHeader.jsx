@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { format, addDays } from "date-fns";
 
 const CalendarHeader = ({
@@ -10,18 +10,48 @@ const CalendarHeader = ({
   isColumnSelected,
   isCurrentWeek,
   minWeekWidth = "140px",
-  weekHeaderFormat = "detailed", 
+  weekHeaderFormat = "detailed",
+  scrollRef,
 }) => {
+  useEffect(() => {
+    const headerElement = weeksRowRef.current;
+    
+    if (headerElement && scrollRef?.current) {
+      const handleHeaderScroll = () => {
+        if (scrollRef.current) {
+          scrollRef.current.forEach(rowRef => {
+            if (rowRef && rowRef !== headerElement) {
+              rowRef.scrollLeft = headerElement.scrollLeft;
+            }
+          });
+        }
+      };
+
+      headerElement.addEventListener('scroll', handleHeaderScroll);
+      
+      return () => {
+        headerElement.removeEventListener('scroll', handleHeaderScroll);
+      };
+    }
+  }, [weeksRowRef, scrollRef]);
+
+  const scrollbarHideStyle = {
+    msOverflowStyle: 'none',
+    scrollbarWidth: 'none',
+    WebkitScrollbar: {
+      display: 'none'
+    }
+  };
+
   return (
     <div className="flex bg-white border-b border-gray-200 sticky top-0 z-20">
       <div className="w-[300px] flex-shrink-0 px-4 py-3 font-medium text-gray-700 bg-white border-r border-gray-200">
         {title} ({count})
       </div>
       <div
-        className={`flex ${weekHeaderFormat === "detailed" ? "flex-1" : ""} overflow-x-auto ${
-          weekHeaderFormat === "detailed" ? "scrollbar-none" : "scrollbar-thin"
-        }`}
+        className={`flex ${weekHeaderFormat === "detailed" ? "flex-1" : ""} overflow-x-auto`}
         ref={weeksRowRef}
+        style={scrollbarHideStyle}
       >
         {calendarWeeks.map((weekStart, index) => {
           const weekEnd = addDays(weekStart, 6);
@@ -59,6 +89,11 @@ const CalendarHeader = ({
           );
         })}
       </div>
+      <style jsx>{`
+        div::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };
