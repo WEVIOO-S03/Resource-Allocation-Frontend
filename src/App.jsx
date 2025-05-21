@@ -7,6 +7,7 @@ import ProjectList from "./pages/projectList";
 import ResourcesPage from "./pages/ResourcesPage";
 import ProjectDetails from "./pages/projectDetails";
 import { isAuthenticated, isAdmin } from "./api/authService";
+import ResourceDetailsPage from "./pages/ResourceDetailsPage";
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   if (!isAuthenticated()) {
@@ -57,6 +58,16 @@ export default function App() {
             </ProtectedRoute>
           } 
         />
+
+        <Route 
+        path="/resources/:id" 
+        element={
+          <ProtectedRoute>
+        <ResourceDetailsPage />
+          </ProtectedRoute>
+        }
+        />
+
         
         <Route 
           path="/edituser/:id" 

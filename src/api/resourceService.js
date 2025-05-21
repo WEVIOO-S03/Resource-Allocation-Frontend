@@ -33,17 +33,26 @@ class ResourceService {
     }
   }
   
-  static async getResourceDetails(resourceId) {
+  static async getResourceDetails(resourceId, date = null) {
     try {
       const token = localStorage.getItem('token');
       const headers = {
         Authorization: `Bearer ${token}`,
       };
       
-      const response = await fetch(`${API_URL}/resources/${resourceId}`, {
+      const url = new URL(`${API_URL}/resources/${resourceId}`);
+      if (date) {
+        url.searchParams.append('date', date instanceof Date ? format(date, 'yyyy-MM-dd') : date);
+      }
+      
+      const response = await fetch(url, {
         method: 'GET',
         headers,
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       
       const data = await response.json();
       return data;
@@ -69,6 +78,10 @@ class ResourceService {
           occupationRate
         })
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
       
       const data = await response.json();
       return data;

@@ -25,7 +25,7 @@ const ResourceCalendarRow = ({
             onClick={() => toggleRowExpansion(employee.id)} 
           >
             <div className="flex items-center w-full">
-              <Link to={`/`}>
+              <Link to={`/resources/${employee.id}`}>
                 <img
                   src={
                     employee.avatar ||
@@ -36,7 +36,11 @@ const ResourceCalendarRow = ({
                 />
               </Link>
               <div className="ml-3">
-                <div className="font-medium text-gray-900 text-sm">{employee.fullName}</div>
+                <div className="font-medium text-gray-900 text-sm">
+                  <Link to={`/resources/${employee.id}`} className="hover:text-emerald-600">
+                    {employee.fullName}
+                  </Link>
+                </div>
                 <div className="text-xs text-gray-500 mt-0.5">{employee.position}</div>
                 <div className="text-xs text-gray-500">
                   Projects: {employee.projects?.length || 0} |
@@ -54,7 +58,7 @@ const ResourceCalendarRow = ({
             ref={(el) => {
               if (el) {
                 attendanceRowsRef.current[
-                  deptIndex * employee.projects?.length + empIndex
+                  deptIndex * (employee.projects?.length || 1) + empIndex
                 ] = el;
               }
             }}
@@ -102,7 +106,7 @@ const ResourceCalendarRow = ({
                 ref={(el) => {
                   if (el) {
                     const rowIndex =
-                      deptIndex * employee.projects?.length +
+                      deptIndex * (employee.projects?.length || 1) +
                       empIndex +
                       projectIndex +
                       1;
