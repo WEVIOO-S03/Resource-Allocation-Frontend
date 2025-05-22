@@ -60,7 +60,7 @@ const CalendarHeader = ({
               key={index}
               style={{ minWidth: minWeekWidth, width: minWeekWidth }}
               className={`flex-shrink-0 flex flex-col items-center justify-center p-2 border-r border-gray-200 cursor-pointer hover:bg-gray-100 ${
-                isColumnSelected(weekStart) ? "bg-blue-200" : ""
+                isColumnSelected(weekStart) ? "bg-gray-100" : ""
               } ${
                 isCurrentWeek(weekStart)
                   ? weekHeaderFormat === "detailed"

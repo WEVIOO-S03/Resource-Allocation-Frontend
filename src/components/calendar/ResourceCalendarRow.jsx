@@ -96,7 +96,7 @@ const ResourceCalendarRow = ({
                 key={weekIndex}
                 className={`min-w-[140px] h-auto flex flex-col items-center justify-center border-r border-gray-200 cursor-pointer hover:bg-gray-100 ${
                   isCurrentWeek(weekStart) ? "bg-blue-50 border-l-2 border-r-2 border-blue-500" : ""
-                } ${isColumnSelected(weekStart) ? "bg-blue-50" : ""}`}
+                } ${isColumnSelected(weekStart) ? "bg-gray-100" : ""}`}
               >
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold ${
                   getAttendanceStatus(employee.id, weekStart) === "full" ? "bg-green-500" :
@@ -147,7 +147,7 @@ const ResourceCalendarRow = ({
                     key={weekIndex}
                     className={`min-w-[140px] flex flex-col items-center justify-center border-r border-gray-200 cursor-pointer hover:bg-gray-100 ${
                       isCurrentWeek(weekStart) ? "bg-blue-50 border-l-2 border-r-2 border-blue-500" : ""
-                    } ${isColumnSelected(weekStart) ? "bg-gray-200" : ""}`}
+                    } ${isColumnSelected(weekStart) ? "bg-gray-100" : ""}`}
                   >
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold ${
                       getAttendanceStatus(employee.id, weekStart, project.id) === "full" ? "bg-green-500" :
