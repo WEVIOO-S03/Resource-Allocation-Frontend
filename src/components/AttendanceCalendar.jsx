@@ -240,6 +240,18 @@ const AttendanceCalendar = ({
     return record ? record.rate : 0;
   };
 
+  const getAvailabilityBackgroundColor = (availability) => {
+    const availabilityValue = availability || 0;
+    
+    if (availabilityValue >= 70) {
+      return "bg-green-200 border-green-200 hover:bg-green-100";
+    } else if (availabilityValue >= 40) {
+      return "bg-yellow-200 border-yellow-200 hover:bg-yellow-100";
+    } else {
+      return "bg-red-200 border-red-200 hover:bg-red-100";
+    }
+  };
+
   const handleColumnClick = (week) => {
     setSelectedColumn(week);
   };
@@ -496,7 +508,7 @@ const AttendanceCalendar = ({
                   availableResources.map((resource) => (
                     <div
                       key={`resource-${resource.id}`}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                      className={`flex items-center justify-between p-4 border rounded-lg ${getAvailabilityBackgroundColor(resource.availability)}`}
                     >
                       <div className="flex items-center space-x-4">
                         <img

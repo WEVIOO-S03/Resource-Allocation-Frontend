@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-import ResourceService from '../../api/resourceService';
+import ResourceService from '../../api/resourceService'; 
 
 const OccupationChart = ({ selectedDate = null, maxResults = 5 }) => {
   const [resources, setResources] = useState([]);
