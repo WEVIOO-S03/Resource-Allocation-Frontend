@@ -10,7 +10,7 @@ class ResourceService {
         Authorization: `Bearer ${token}`,
       };
       
-      const url = new URL(`${API_URL}/api/resources`);
+      const url = new URL(`${API_URL}/resources`);
       if (date) {
         url.searchParams.append('date', date);
       }
@@ -40,7 +40,7 @@ class ResourceService {
         Authorization: `Bearer ${token}`,
       };
       
-      const url = new URL(`${API_URL}/api/resources/${resourceId}`);
+      const url = new URL(`${API_URL}/resources/${resourceId}`);
       if (date) {
         url.searchParams.append('date', date instanceof Date ? format(date, 'yyyy-MM-dd') : date);
       }
@@ -70,7 +70,7 @@ class ResourceService {
         'Content-Type': 'application/json'
       };
       
-      const response = await fetch(`${API_URL}/api/resources/${resourceId}/occupation`, {
+      const response = await fetch(`${API_URL}/resources/${resourceId}/occupation`, {
         method: 'PATCH',
         headers,
         body: JSON.stringify({
@@ -101,7 +101,7 @@ class ResourceService {
       const formattedStartDate = startDate instanceof Date ? format(startDate, 'yyyy-MM-dd') : startDate;
       const formattedEndDate = endDate instanceof Date ? format(endDate, 'yyyy-MM-dd') : endDate;
       
-      let url = new URL(`${API_URL}/api/resources/occupation-records`);
+      let url = new URL(`${API_URL}/resources/occupation-records`);
       url.searchParams.append('startDate', formattedStartDate);
       url.searchParams.append('endDate', formattedEndDate);
       
@@ -167,7 +167,7 @@ class ResourceService {
       
       const formattedDate = date instanceof Date ? format(date, 'yyyy-MM-dd') : date;
       
-      const response = await fetch(`${API_URL}/api/resources/${resourceId}/projects/${projectId}/occupation-records`, {
+      const response = await fetch(`${API_URL}/resources/${resourceId}/projects/${projectId}/occupation-records`, {
         method: 'POST',
         headers,
         body: JSON.stringify({

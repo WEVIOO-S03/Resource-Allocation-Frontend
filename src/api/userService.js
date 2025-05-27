@@ -11,7 +11,7 @@ export const getAuthToken = () => {
 
 export const fetchUsers = async (page = 1, limit = 10) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/admin/users?page=${page}&limit=${limit}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/users?page=${page}&limit=${limit}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -68,7 +68,7 @@ export const fetchUsers = async (page = 1, limit = 10) => {
 
 export const fetchProjects = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/projects`, {
+    const response = await fetch(`${API_BASE_URL}/projects`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -95,7 +95,7 @@ export const fetchProjects = async () => {
 
 export const getDashboardStats = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/admin/dashboard-stats`, {
+    const response = await fetch(`${API_BASE_URL}/admin/dashboard-stats`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -133,7 +133,7 @@ export const updateUserAccess = async (userId, data) => {
   try {
     console.log(`Sending update access request for user ${userId}:`, data);
     
-    const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/update-access`, {
+    const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/update-access`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -155,7 +155,7 @@ export const updateUserAccess = async (userId, data) => {
 
 export const deleteUser = async (userId) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -176,7 +176,7 @@ export const deleteUser = async (userId) => {
 
 export const fetchUserProjects = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/projects`, {
+    const response = await fetch(`${API_BASE_URL}/projects`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
