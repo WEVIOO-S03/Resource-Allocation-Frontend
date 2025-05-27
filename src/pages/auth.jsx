@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-// Import animate.css
 import 'animate.css';
+import { useNavigate } from 'react-router-dom';
 
 const AuthPage = () => {
   const [activeTab, setActiveTab] = useState('login');
@@ -17,6 +17,10 @@ const AuthPage = () => {
     confirmPassword: '',
     rememberMe: false
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const navigate = useNavigate();
 
   const handleInputChange = (e) => {
     const { id, value, type, checked } = e.target;
@@ -26,42 +30,119 @@ const AuthPage = () => {
     });
   };
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    console.log('Login attempt:', { 
-      email: formData.email, 
-      password: formData.password 
-    });
+    setLoading(true);
+    setError(null);
     
-    setTimeout(() => {
-      window.location.href = 'admin-dashboard.html';
-    }, 1000);
+    try {
+      const response = await fetch('http://localhost:8000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          email: formData.email, 
+          password: formData.password 
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
+      
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      setSuccess('Login successful!');
+      setTimeout(() => {
+        const isAdmin = Array.isArray(data.user.roles) && data.user.roles.includes('ROLE_ADMIN');
+        navigate(isAdmin ? '/admin' : '/projects');
+      }, 1000);
+
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
     
-    console.log('Registration data:', {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.registerEmail,
-      password: formData.registerPassword
-    });
+    // Password validation
+    if (formData.registerPassword !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
     
-    alert('Registration successful! Please wait for admin approval.');
-    setFormData({
-      ...formData,
-      firstName: '',
-      lastName: '',
-      registerEmail: '',
-      registerPassword: '',
-      confirmPassword: ''
-    });
-    setActiveTab('login');
-  };
+    try {
 
-  useEffect(() => {
-  }, []);
+      console.log('Sending registration request with data:', {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.registerEmail,
+        password: formData.registerPassword
+      });
+
+      const response = await fetch('http://localhost:8000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.registerEmail,
+          password: formData.registerPassword
+        }),
+      });
+      
+      // Check if the response is JSON before trying to parse it
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error(`Server returned ${response.status}: ${response.statusText}. Not a JSON response.`);
+      }
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        if (data.errors) {
+          const errorMessages = Object.values(data.errors).join(', ');
+          throw new Error(errorMessages);
+        } else {
+          throw new Error(data.error || 'Registration failed');
+        }
+      }
+      
+      setSuccess('Registration successful! Please wait for admin approval.');
+      
+      setFormData({
+        ...formData,
+        firstName: '',
+        lastName: '',
+        registerEmail: '',
+        registerPassword: '',
+        confirmPassword: ''
+      });
+      
+      setTimeout(() => {
+        setActiveTab('login');
+        setSuccess(null);
+      }, 3000);
+      
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="relative overflow-hidden min-h-screen" style={{
@@ -123,24 +204,36 @@ const AuthPage = () => {
           </div>
           
           <div className="flex justify-center mb-6 animate__animated animate__fadeIn animate__delay-1s"> 
-  <div className="flex bg-white bg-opacity-20 rounded-lg p-1">
-    <button 
-      className={`py-2 px-6 text-white rounded-lg font-medium ${activeTab === 'login' ? 'text-indigo-600' : ''}`}
-      onClick={() => setActiveTab('login')}
-      style={activeTab === 'login' ? { background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' } : {}}
-    >
-      Sign In
-    </button>
-    <button 
-      className={`py-2 px-6 text-white rounded-lg font-medium ${activeTab === 'register' ? 'text-indigo-600' : ''}`}
-      onClick={() => setActiveTab('register')}
-      style={activeTab === 'register' ? { background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' } : {}}
-    >
-      Sign Up
-    </button>
-  </div>
-</div>
+            <div className="flex bg-white bg-opacity-20 rounded-lg p-1">
+              <button 
+                className={`py-2 px-6 text-white rounded-lg font-medium ${activeTab === 'login' ? 'text-indigo-600' : ''}`}
+                onClick={() => setActiveTab('login')}
+                style={activeTab === 'login' ? { background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' } : {}}
+              >
+                Sign In
+              </button>
+              <button 
+                className={`py-2 px-6 text-white rounded-lg font-medium ${activeTab === 'register' ? 'text-indigo-600' : ''}`}
+                onClick={() => setActiveTab('register')}
+                style={activeTab === 'register' ? { background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)' } : {}}
+              >
+                Sign Up
+              </button>
+            </div>
+          </div>
 
+          {/* Display errors/success messages */}
+          {error && (
+            <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg animate__animated animate__fadeIn">
+              {error}
+            </div>
+          )}
+          
+          {success && (
+            <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg animate__animated animate__fadeIn">
+              {success}
+            </div>
+          )}
           
           {/* Login Form */}
           <div className={`p-8 rounded-lg backdrop-filter backdrop-blur-lg bg-white bg-opacity-90 shadow-2xl transition-all duration-300 transform hover:translate-y-1 hover:shadow-2xl animate__animated
@@ -160,6 +253,7 @@ const AuthPage = () => {
                     placeholder="email@example.com"
                     value={formData.email}
                     onChange={handleInputChange}
+                    required
                   />
                 </div>
               </div>
@@ -176,6 +270,7 @@ const AuthPage = () => {
                     placeholder="••••••••"
                     value={formData.password}
                     onChange={handleInputChange}
+                    required
                   />
                   <span 
                     className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer text-gray-500"
@@ -202,8 +297,9 @@ const AuthPage = () => {
                 className="w-full text-white font-bold py-3 px-4 rounded-lg focus:outline-none transform transition-all duration-300 hover:translate-y-1 hover:shadow-lg shadow-md"
                 type="submit"
                 style={{background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)'}}
+                disabled={loading}
               >
-                Sign In
+                {loading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
           </div>
@@ -220,9 +316,10 @@ const AuthPage = () => {
                     className="appearance-none border border-transparent rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500 focus:shadow-outline transform transition-all duration-300 hover:shadow-md focus:translate-y-1 shadow"
                     id="firstName"
                     type="text"
-                    placeholder="fisrtname"
+                    placeholder="First name"
                     value={formData.firstName}
                     onChange={handleInputChange}
+                    required
                   />
                 </div>
                 <div>
@@ -231,9 +328,10 @@ const AuthPage = () => {
                     className="appearance-none border border-transparent rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:border-indigo-500 focus:shadow-outline transform transition-all duration-300 hover:shadow-md focus:translate-y-1 shadow"
                     id="lastName"
                     type="text"
-                    placeholder="lastname"
+                    placeholder="Last name"
                     value={formData.lastName}
                     onChange={handleInputChange}
+                    required
                   />
                 </div>
               </div>
@@ -250,6 +348,7 @@ const AuthPage = () => {
                     placeholder="email@example.com"
                     value={formData.registerEmail}
                     onChange={handleInputChange}
+                    required
                   />
                 </div>
               </div>
@@ -266,6 +365,8 @@ const AuthPage = () => {
                     placeholder="••••••••"
                     value={formData.registerPassword}
                     onChange={handleInputChange}
+                    required
+                    minLength="6"
                   />
                 </div>
               </div>
@@ -282,6 +383,7 @@ const AuthPage = () => {
                     placeholder="••••••••"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
+                    required
                   />
                 </div>
               </div>
@@ -289,8 +391,9 @@ const AuthPage = () => {
                 className="w-full text-white font-bold py-3 px-4 rounded-lg focus:outline-none transform transition-all duration-300 hover:translate-y-1 hover:shadow-lg shadow-md"
                 type="submit"
                 style={{background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)'}}
+                disabled={loading}
               >
-                Create Account
+                {loading ? 'Creating Account...' : 'Create Account'}
               </button>
             </form>
           </div>
