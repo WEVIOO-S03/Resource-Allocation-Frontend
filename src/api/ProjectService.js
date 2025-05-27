@@ -1,7 +1,6 @@
 import { format, startOfWeek, endOfWeek } from 'date-fns';
 
-const API_URL = 'http://localhost:8000/api';
-
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8081';
 export const ProjectService = {
   getAuthToken() {
     return localStorage.getItem('token');
@@ -14,7 +13,7 @@ export const ProjectService = {
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch(`${API_URL}/projects/${projectId}`, {
+      const response = await fetch(`${API_URL}/api/projects/${projectId}`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -39,7 +38,7 @@ export const ProjectService = {
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch(`${API_URL}/resources`, {
+      const response = await fetch(`${API_URL}/api/resources`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -72,7 +71,7 @@ export const ProjectService = {
     const formattedEndDate = format(endOfWeek(endDate, { weekStartsOn: 1 }), 'yyyy-MM-dd');
     
     const response = await fetch(
-      `${API_URL}/resources/occupation-records?startDate=${formattedStartDate}&endDate=${formattedEndDate}&projectId=${projectId}`, 
+      `${API_URL}/api/resources/occupation-records?startDate=${formattedStartDate}&endDate=${formattedEndDate}&projectId=${projectId}`, 
       {
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -125,7 +124,7 @@ export const ProjectService = {
       throw new Error('No authentication token found');
     }
     
-    const response = await fetch(`${API_URL}/projects/${projectId}/resources/${resourceId}`, {
+    const response = await fetch(`${API_URL}/api/projects/${projectId}/resources/${resourceId}`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -159,7 +158,7 @@ export const ProjectService = {
         throw new Error('No authentication token found');
       }
       
-      const response = await fetch(`${API_URL}/projects/${projectId}/resources/${resourceId}`, {
+      const response = await fetch(`${API_URL}/api/projects/${projectId}/resources/${resourceId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -207,7 +206,7 @@ export const ProjectService = {
       const weekStart = startOfWeek(date, { weekStartsOn: 1 });
       const formattedWeekStart = format(weekStart, 'yyyy-MM-dd');
 
-      const response = await fetch(`${API_URL}/resources/${resourceId}/projects/${projectId}/occupation-records`, {
+      const response = await fetch(`${API_URL}/api/resources/${resourceId}/projects/${projectId}/occupation-records`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -239,7 +238,7 @@ export const ProjectService = {
         throw new Error('No authentication token found');
       }
       
-      const response = await fetch(`${API_URL}/resources/${resourceId}/projects/${projectId}/reset-occupation`, {
+      const response = await fetch(`${API_URL}/api/resources/${resourceId}/projects/${projectId}/reset-occupation`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
