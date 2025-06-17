@@ -1,6 +1,6 @@
 import { format, startOfWeek } from 'date-fns';
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8081';
 
 class ResourceService {
   static async getAllResources(date = null) {
