@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import 'animate.css';
 import { useNavigate } from 'react-router-dom';
+import { login, register, validatePasswordMatch } from '../api/authService';
 
 const AuthPage = () => {
   const [activeTab, setActiveTab] = useState('login');
@@ -35,38 +36,18 @@ const AuthPage = () => {
     setLoading(true);
     setError(null);
     
-    try {
-      const response = await fetch('http://localhost:8000/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          email: formData.email, 
-          password: formData.password 
-        }),
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
-      }
-      
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
+    const result = await login(formData.email, formData.password);
+    
+    if (result.success) {
       setSuccess('Login successful!');
       setTimeout(() => {
-        const isAdmin = Array.isArray(data.user.roles) && data.user.roles.includes('ROLE_ADMIN');
-        navigate(isAdmin ? '/admin' : '/projects');
+        navigate(result.isAdmin ? '/admin' : '/projects');
       }, 1000);
-
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    } else {
+      setError(result.error);
     }
+    
+    setLoading(false);
   };
 
   const handleRegisterSubmit = async (e) => {
@@ -76,51 +57,22 @@ const AuthPage = () => {
     setSuccess(null);
     
     // Password validation
-    if (formData.registerPassword !== formData.confirmPassword) {
+    if (!validatePasswordMatch(formData.registerPassword, formData.confirmPassword)) {
       setError('Passwords do not match');
       setLoading(false);
       return;
     }
     
-    try {
-
-      console.log('Sending registration request with data:', {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        email: formData.registerEmail,
-        password: formData.registerPassword
-      });
-
-      const response = await fetch('http://localhost:8000/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.registerEmail,
-          password: formData.registerPassword
-        }),
-      });
-      
-      // Check if the response is JSON before trying to parse it
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error(`Server returned ${response.status}: ${response.statusText}. Not a JSON response.`);
-      }
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        if (data.errors) {
-          const errorMessages = Object.values(data.errors).join(', ');
-          throw new Error(errorMessages);
-        } else {
-          throw new Error(data.error || 'Registration failed');
-        }
-      }
-      
+    const userData = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.registerEmail,
+      password: formData.registerPassword
+    };
+    
+    const result = await register(userData);
+    
+    if (result.success) {
       setSuccess('Registration successful! Please wait for admin approval.');
       
       setFormData({
@@ -136,19 +88,17 @@ const AuthPage = () => {
         setActiveTab('login');
         setSuccess(null);
       }, 3000);
-      
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    } else {
+      setError(result.error);
     }
+    
+    setLoading(false);
   };
 
   return (
     <div className="relative overflow-hidden min-h-screen" style={{
       background: 'linear-gradient(135deg, #4f46e5 0%, #9333ea 100%)'
     }}>
-      {/* Floating animated shapes background */}
       <div className="floating-shapes">
         <div style={{
           width: '100px',

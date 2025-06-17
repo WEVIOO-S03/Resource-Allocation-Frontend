@@ -6,7 +6,7 @@ import {
   faBell,
   faChevronDown
 } from '@fortawesome/free-solid-svg-icons';
-import { logout, getCurrentUser } from '../api/authService';
+import { logout, getCurrentUser } from '../../api/authService';
 
 const Header = ({ title }) => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);

@@ -10,12 +10,12 @@ import {
   faTags,
 } from '@fortawesome/free-solid-svg-icons';
 import { useParams } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
-import Header from '../components/Header';
+import Sidebar from '../components/common/Sidebar';
+import Header from '../components/common/Header';
 import { fetchUsers, fetchProjects, updateUserAccess } from '../api/userService';
 
 const ProjectAccessManagement = () => {
-  const { id } = useParams(); // Get the ID from URL parameters
+  const { id } = useParams(); 
   const [user, setUser] = useState(null);
   const [position, setPosition] = useState('');
   const [skills, setSkills] = useState([]);

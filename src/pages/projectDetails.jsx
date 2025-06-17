@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import '../styles/AttendanceView.css';
-import Layout from '../components/Layout';
-import DashboardHeader from '../components/DashboardHeader'; 
-import PerformanceCard from '../components/PerformanceStat'; 
-import AvailabilityChart from '../components/AvailavilityChart';
-import OccupationChart from '../components/OccupationChart';
+//import '../styles/AttendanceView.css';
+import Layout from '../components/common/Layout';
+import DashboardHeader from '../components/charts/DashboardHeader'; 
+import PerformanceCard from '../components/charts/PerformanceStat'; 
+import AvailabilityChart from '../components/charts/AvailavilityChart';
+import OccupationChart from '../components/charts/OccupationChart';
 import AttendanceCalendar from '../components/AttendanceCalendar';
 import ProjectService from '../api/ProjectService';
 

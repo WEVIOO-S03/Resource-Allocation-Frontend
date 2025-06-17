@@ -1,10 +1,17 @@
 // api/userService.js
 
-export const getAuthToken = () => localStorage.getItem('token');
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8081';
+
+export const getAuthToken = () => {
+  if (typeof window !== 'undefined' && window.localStorage) {
+    return localStorage.getItem('token');
+  }
+  return null;
+};
 
 export const fetchUsers = async (page = 1, limit = 10) => {
   try {
-    const response = await fetch(`http://localhost:8000/api/admin/users?page=${page}&limit=${limit}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/users?page=${page}&limit=${limit}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -12,7 +19,6 @@ export const fetchUsers = async (page = 1, limit = 10) => {
       }
     });
     
-
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
       console.error('Non-JSON response received:', await response.text());
@@ -25,27 +31,26 @@ export const fetchUsers = async (page = 1, limit = 10) => {
     
     const data = await response.json();
    
-console.log('User statuses from DB:', data.map(user => user.status));
+    console.log('User statuses from DB:', data.map(user => user.status));
 
+    const formattedUsers = data.map(user => ({
+      id: user.id,
+      name: `${user.firstName} ${user.lastName}`,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      status: user.status === 'pending' ? 'Pending' : 
+              user.status === 'approved' ? 'Approved' : 'Inactive',
+      projects: user.projects, 
+      position: user.position,
+      skills: user.skills,
+      created: new Date(user.createdAt).toLocaleDateString(),
+      role: user.roles && Array.isArray(user.roles) && user.roles.includes('ROLE_ADMIN') 
+            ? 'Administrator' 
+            : 'User'
+    }));
 
-const formattedUsers = data.map(user => ({
-  id: user.id,
-  name: `${user.firstName} ${user.lastName}`,
-  firstName: user.firstName,
-  lastName: user.lastName,
-  email: user.email,
-  status: user.status === 'pending' ? 'Pending' : 
-          user.status === 'approved' ? 'Approved' : 'Inactive',
-  projects: user.projects, 
-  position: user.position,
-  skills: user.skills,
-  created: new Date(user.createdAt).toLocaleDateString(),
-  role: user.roles && Array.isArray(user.roles) && user.roles.includes('ROLE_ADMIN') 
-        ? 'Administrator' 
-        : 'User'
-}));
-
-console.log('Formatted statuses:', formattedUsers.map(user => user.status));
+    console.log('Formatted statuses:', formattedUsers.map(user => user.status));
     return {
       users: formattedUsers,
       total: formattedUsers.length 
@@ -61,10 +66,9 @@ console.log('Formatted statuses:', formattedUsers.map(user => user.status));
   }
 };
 
-
 export const fetchProjects = async () => {
   try {
-    const response = await fetch(`http://localhost:8000/api/projects`, {
+    const response = await fetch(`${API_BASE_URL}/projects`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -85,14 +89,13 @@ export const fetchProjects = async () => {
     return await response.json();
   } catch (error) {
     console.error('Error fetching projects:', error);
-    
     return [];
   }
 };
 
 export const getDashboardStats = async () => {
   try {
-    const response = await fetch('/api/admin/dashboard-stats', {
+    const response = await fetch(`${API_BASE_URL}/admin/dashboard-stats`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -126,12 +129,11 @@ export const getDashboardStats = async () => {
   }
 };
 
-
 export const updateUserAccess = async (userId, data) => {
   try {
     console.log(`Sending update access request for user ${userId}:`, data);
     
-    const response = await fetch(`http://localhost:8000/api/admin/users/${userId}/update-access`, {
+    const response = await fetch(`${API_BASE_URL}/admin/users/${userId}/update-access`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -151,10 +153,9 @@ export const updateUserAccess = async (userId, data) => {
   }
 };
 
-
 export const deleteUser = async (userId) => {
   try {
-    const response = await fetch(`http://localhost:8000/api/admin/users/${userId}`, {
+    const response = await fetch(`${API_BASE_URL}/admin/users/${userId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -175,7 +176,7 @@ export const deleteUser = async (userId) => {
 
 export const fetchUserProjects = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/projects', {
+    const response = await fetch(`${API_BASE_URL}/projects`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${getAuthToken()}`,
@@ -199,4 +200,3 @@ export const fetchUserProjects = async () => {
     return [];
   }
 };
-
