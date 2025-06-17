@@ -128,6 +128,24 @@ const AttendanceCalendar = ({
       await fetchOccupationRecords();
       
       setIsResourceModalOpen(false);
+      
+      try {
+        const startDate = startOfMonth(currentDate);
+        const endDate = endOfMonth(currentDate);
+        const days = eachDayOfInterval({ start: startDate, end: endDate });
+        
+        const updatedRecords = { ...occupationRecords };
+        Object.keys(updatedRecords).forEach(key => {
+          if (key.startsWith(`${resourceId}-`)) {
+            delete updatedRecords[key];
+          }
+        });
+        setOccupationRecords(updatedRecords);
+        
+        fetchOccupationRecords();
+      } catch (err) {
+        console.warn('Error clearing occupation rates for newly added resource:', err);
+      }
     } catch (error) {
       console.error("Error assigning resource:", error);
     } finally {
@@ -149,6 +167,7 @@ const AttendanceCalendar = ({
     } finally {
       setLoading(false);
     }
+  };
   };
 
   const handleCellClick = (employee, weekStartDate) => {
